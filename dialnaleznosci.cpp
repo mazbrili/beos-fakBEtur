@@ -4,8 +4,8 @@
 #include <StringView.h>
 #include <TextControl.h>
 #include <View.h>
-#include "ColumnListView.h"
-#include "CLVEasyItem.h"
+#include "santa/ColumnListView.h"
+#include "santa/CLVEasyItem.h"
 
 #include "globals.h"
 #include "fakdata.h"	// toint...

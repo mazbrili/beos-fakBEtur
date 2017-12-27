@@ -6,7 +6,7 @@
 #include <Window.h>
 #include <sqlite.h>
 #include "befaktab.h"
-#include "CLVEasyItem.h"
+#include "santa/CLVEasyItem.h"
 
 class BButton;
 class BMessage;

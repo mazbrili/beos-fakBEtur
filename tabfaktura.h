@@ -8,6 +8,8 @@
 class BBox;
 class BButton;
 class BHandler;
+class BMenuItem;
+class BPopUpMenu;
 class BTab;
 class BTabView;
 class BTextControl;

@@ -2,7 +2,7 @@
 #ifndef _BEFAKTAB_H
 #define _BEFAKTAB_H
 
-#include "CLVEasyItem.h"
+#include "santa/CLVEasyItem.h"
 #include <sqlite.h>
 
 class BHandler;

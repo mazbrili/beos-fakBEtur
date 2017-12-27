@@ -8,8 +8,8 @@
 #include <String.h>
 #include <StringView.h>
 #include <View.h>
-#include "ColumnListView.h"
-#include "CLVEasyItem.h"
+#include "santa/ColumnListView.h"
+#include "santa/CLVEasyItem.h"
 
 #include "globals.h"
 #include "dialnaleznosci.h"
