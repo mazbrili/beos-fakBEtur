@@ -17,7 +17,7 @@
 #include <CheckBox.h>
 #include <TabView.h>
 #include <TextControl.h>
-#include "ColumnListView.h"
+#include "santa/ColumnListView.h"
 #include <stdio.h>
 
 const uint32 LIST_INV	= 'TFLI';

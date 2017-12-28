@@ -3,7 +3,7 @@
 #define _DIALSTAT_H
 
 #include <Window.h>
-#include "CLVEasyItem.h"
+#include "santa/CLVEasyItem.h"
 #include <sqlite.h>
 #include "befaktab.h"
 

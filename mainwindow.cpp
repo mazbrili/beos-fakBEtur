@@ -396,8 +396,7 @@ int BeFAKMainWindow::OpenDatabase(void) {
 	// open database anyway - new or existing
 	dbData = sqlite_open(DATABASE_PATHNAME, 0666, &dbErrMsg);
 	if ((dbData==0)||(dbErrMsg!=0)) {
-		// due to sqlite problems - this code is never reached; pity
-//		printf("database not found\n");
+		printf("database not found\n");
 		return -1;
 	}
 	if (fResult != B_OK) {

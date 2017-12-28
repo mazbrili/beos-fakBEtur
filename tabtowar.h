@@ -9,6 +9,7 @@ class BBox;
 class BButton;
 class BCheckBox;
 class BHandler;
+class BMenuItem;
 class BMessage;
 class BPopUpMenu;
 class BStringView;

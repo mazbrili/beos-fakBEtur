@@ -5,7 +5,7 @@
 #include <String.h>
 #include <TextControl.h>
 #include <View.h>
-#include "ColumnListView.h"
+#include "santa/ColumnListView.h"
 
 #include "globals.h"
 #include "dialvat.h"

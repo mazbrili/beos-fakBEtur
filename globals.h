@@ -16,7 +16,7 @@
 	// Qt-style translation helper
 	#define tr(x) SpTranslate(x)
 	// db file with full path
-	#define DATABASE_PATHNAME "/boot/home/config/share/fakbetur.db"
+	#define DATABASE_PATHNAME "/boot/home/config/settings/fakbetur.db"
 
 	// some globally visible stuff
 	#define MSG_REQTOWARUP		'RQTU'	// symbols in faktura
