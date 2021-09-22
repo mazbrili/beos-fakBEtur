@@ -8,7 +8,7 @@ http://members.elysium.pl/html/beos.html
 
 fakBEtur is a program supporting invoicing. The program uses its own database in which it stores information about the issued documents. The database is also used to store data of contractors and goods.
 
-#ZRZUTY EKRANU
+#SCREEN SHOTS
 ![Screenshot](/images/fakbetur-01.png?raw=true) 
 ![Screenshot](/images/fakbetur-02.png?raw=true) 
 ![Screenshot](/images/fakbetur-03.png?raw=true) 
