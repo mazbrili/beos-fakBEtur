@@ -1,8 +1,8 @@
-Lista pomysłów i błędów
-(własne i na podstawie recenzji pokonkursowych)
-- opcja wystawiania cen brutto (np. aby docelowo cena z 22% była 15zł)
-- wprowadzanie towarów przez fakturę zakupu (?)
-- otrzeżenie o zbyt dużym rabacie - próba sprzedaży po cenie niższej od ceny zakupu
-- lepsze sortowanie (własne)
-- wygląd: na modłę Be rozbić edycję na nowe okna, a w głównym tylko listy z pełną informacją o dokumencie (to co z lewej)
-- kontrola wprowadzania: nrb, nip, kod pocztowy, nazwa kontrahenta (niby jak to?) - odpowiednie ostrzeżenia
+List of ideas and mistakes
+(own and based on post-competition reviews)
+- the option of displaying gross prices (e.g. for the target price of 22% to be PLN 15)
+- entering goods via a purchase invoice (?)
+- too much discount warning - attempted to sell at a price lower than the purchase price
+- better sorting (own)
+- appearance: in the style of Be break the edition into new windows, and in the main only lists with full information about the document (what is on the left)
+- input control: nrb, tax identification number, zip code, contractor's name (how?) - appropriate warnings
