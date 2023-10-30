@@ -1,13 +1,13 @@
 //
-// obliczenia via sqlite, dzialaja ladnie jesli argumenty maja '.' np. 25/100.0
-// zaokraglanie do dwoch cyfr wlasne, zgodne z rozporzadzeniem mf (0.005->0.01)
-// pozostaje miec nadzieje, ze jest liczone poprawnie
-// pola ceny[] ida przez sqlite - mozna wpisywac wyrazenia arytmetyczne
+// calculations via sqlite, work fine if the arguments have '.' e.g. 25/100.0
+// rounding to two proper digits, in accordance with the mf regulation (0.005->0.01)
+// let's hope it's counted correctly
+// price[] fields go through sqlite - you can enter arithmetic expressions
 //
-// pole 'usługa' - związane tylko z magazynem
+// 'service' field - related only to the warehouse
 // TODO:
-// blokada: DoCommitCurdata powinno zwracać wartość do Commit, aby móc anulować
-// zmianę pozycji (cur-dirty, zmiana na liście)
+// lock: DoCommitCurdata should return a value to Commit for cancellation
+// change position (cur-dirty, change in list)
 
 #include "globals.h"
 #include "tabtowar.h"
@@ -59,16 +59,16 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 		B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE, B_SINGLE_SELECTION_LIST, false, true, true, true,
 		B_FANCY_BORDER);
 	list->AddColumn(new CLVColumn("Symbol", 54, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE));
-	list->AddColumn(new CLVColumn("Nazwa", 100, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE));
+	list->AddColumn(new CLVColumn("Name", 100, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE));
 	list->SetSortFunction(CLVEasyItem::CompareItems);
 	this->view->AddChild(containerView);
 	list->SetInvocationMessage(new BMessage(LIST_INV));
 	list->SetSelectionMessage(new BMessage(LIST_SEL));
 	// buttons
-	but_new = new BButton(BRect(30,0,140,24), "tt_but_new", "Nowy towar [F5]", new BMessage(BUT_NEW), B_FOLLOW_LEFT|B_FOLLOW_TOP);
-	but_del = new BButton(BRect(30,510,140,534), "tt_but_del", "Usuń zaznaczone [F8]", new BMessage(BUT_DEL), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
-	but_restore = new BButton(BRect(235,510,325,534), "tt_but_restore", "Przywróć [F6]", new BMessage(BUT_RESTORE), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
-	but_save = new BButton(BRect(580,510,670,534), "tt_but_save", "Zapisz", new BMessage(BUT_SAVE), B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM);
+	but_new = new BButton(BRect(30,0,140,24), "tt_but_new", "New item [F5]", new BMessage(BUT_NEW), B_FOLLOW_LEFT|B_FOLLOW_TOP);
+	but_del = new BButton(BRect(30,510,140,534), "tt_but_del", "Delete selected [F8]", new BMessage(BUT_DEL), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
+	but_restore = new BButton(BRect(235,510,325,534), "tt_but_restore", "Restore [F6]", new BMessage(BUT_RESTORE), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
+	but_save = new BButton(BRect(580,510,670,534), "tt_but_save", "Save", new BMessage(BUT_SAVE), B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM);
 	this->view->AddChild(but_new);
 	this->view->AddChild(but_del);
 	this->view->AddChild(but_restore);
@@ -79,18 +79,18 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	but_save->ResizeToPreferred();
 	// box1
 	box1 = new BBox(BRect(230,30,710,140), "tt_box1");
-	box1->SetLabel("Dane towaru");
+	box1->SetLabel("Goods data");
 	this->view->AddChild(box1);
 	// box1-stuff
-	data[0] = new BTextControl(BRect(10,15,270,35), "ttd0", "Nazwa", NULL, new BMessage(DC));
+	data[0] = new BTextControl(BRect(10,15,270,35), "ttd0", "Name", NULL, new BMessage(DC));
 	data[1] = new BTextControl(BRect(280,15,420,35), "ttd1", "Symbol", NULL, new BMessage(DC));
 	data[2] = new BTextControl(BRect(10,50,150,65), "ttd2", "PKWiU", NULL, new BMessage(DC));
 	data[3] = new BTextControl(BRect(160,50,270,65), "ttd3", "j.m.", NULL, new BMessage(DC));
 	box1->AddChild(data[0]); box1->AddChild(data[1]);
 	box1->AddChild(data[2]); box1->AddChild(data[3]);
-	usluga = new BCheckBox(BRect(350,50,420,65), "ttdo", "Usługa", new BMessage(DC));
+	usluga = new BCheckBox(BRect(350,50,420,65), "ttdo", "Service", new BMessage(DC));
 	box1->AddChild(usluga);
-	dodany = new BStringView(BRect(280,80,340,95), "tts0", "Dodano:");
+	dodany = new BStringView(BRect(280,80,340,95), "tts0", "Added:");
 	dodany->SetAlignment(B_ALIGN_RIGHT);
 	box1->AddChild(dodany);
 	dodany = new BStringView(BRect(350,80,420,95), "ttsd", "");
@@ -111,12 +111,12 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	box2->SetLabel("Ceny");
 	this->view->AddChild(box2);
 	// box2-stuff
-	ceny[0] = new BTextControl(BRect(10,15,190,35), "ttc0", "Cena netto (zł)", NULL, new BMessage(DC));
-	ceny[1] = new BTextControl(BRect(10,50,190,65), "ttc1", "Netto zakupu", NULL, new BMessage(DC));
-	ceny[2] = new BTextControl(BRect(10,80,190,95), "ttc2", "Marża (%)", NULL, new BMessage(DC));
+	ceny[0] = new BTextControl(BRect(10,15,190,35), "ttc0", "Net price (PLN)", NULL, new BMessage(DC));
+	ceny[1] = new BTextControl(BRect(10,50,190,65), "ttc1", "Net purchase", NULL, new BMessage(DC));
+	ceny[2] = new BTextControl(BRect(10,80,190,95), "ttc2", "Margin (%)", NULL, new BMessage(DC));
 	ceny[3] = new BTextControl(BRect(200,50,310,65), "ttc3", "Rabat (%)", NULL, new BMessage(DC));
-	ceny[4] = new BTextControl(BRect(10,110,190,125), "ttc4", "Kurs waluty", "1", new BMessage(DC));
-	ceny[5] = new BTextControl(BRect(200,110,310,125), "ttc5", "Cło (%)", NULL, new BMessage(DC));
+	ceny[4] = new BTextControl(BRect(10,110,190,125), "ttc4", "Exchange rate", "1", new BMessage(DC));
+	ceny[5] = new BTextControl(BRect(200,110,310,125), "ttc5", "Duty (%)", NULL, new BMessage(DC));
 	box2->AddChild(ceny[0]);
 	box2->AddChild(ceny[1]);
 	box2->AddChild(ceny[2]);
