@@ -1,11 +1,11 @@
 //
 // IDEAS:
-// - zamiast usuwać/dodawać wszystkie pozitems - może pamiętać ich id?
-//	 generować, uaktualniać, czyścić
-//	 (problem: które UPDATE, które INSERT, a które DELETE)
+// - instead of removing/adding all items - maybe remember their id?
+// generate, update, clean
+// (problem: which UPDATE, which INSERT and which DELETE)
 //
-// wyrzucić uwagi i zastąpić całym podsumowaniem? podsumowanie na 3 karcie?
-// opcja faktury korygującej (jak? trzeba pamiętać co się zmieniło)
+// throw away comments and replace with the entire summary? summary on card 3?
+// correction invoice option (how? you have to remember what has changed)
 //
 
 #include "globals.h"
@@ -60,11 +60,11 @@ const uint32 MENUJM		= 'TFMJ';
 const uint32 PLIST_INV	= 'TFPI';
 const uint32 PLIST_SEL	= 'TFPS';
 
-const char *stransportu[] = { "własny sprzedawcy", "własny odbiorcy", NULL };
-const char *fplatnosci[] = { "gotówką", "przelewem", "czekiem", "kartą płatniczą", "kartą kredytową", NULL };
-extern const char *jmiary[];	// tabtowar.cpp
-const char *plisthead[] = { "#", "Nazwa", "PKWiU", "Ilość", "Jm", "Rabat (%)", "Cena jedn.", "W. netto", "VAT", "W. VAT", "W. brutto", NULL };
-const int plistw[] = { 15, 90, 60, 40, 20, 50, 70, 70, 30, 60, 70, -1 };
+const char *stransportu[] = { "seller's own", "customer's own", NULL };
+const char *fplatnosci[] = { "cash", "transfer", "cheque", "payment card", "credit card", NULL };
+extern const char *jmeasures[]; // tabtowar.cpp
+const char *plisthead[] = { "#", "Name", "PKWiU", "Quantity", "Unit", "Discount (%)", "Unit price", "Net value", "VAT" , "VAT VAT", "Gross VAT", NULL };
+const int slats[] = { 15, 90, 60, 40, 20, 50, 70, 70, 30, 60, 70, -1 };
 
 class pozCListItem : public CLVEasyItem {
 	public:
@@ -116,11 +116,11 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db
 	list->SetInvocationMessage(new BMessage(LIST_INV));
 	list->SetSelectionMessage(new BMessage(LIST_SEL));
 	// buttons
-	but_new = new BButton(BRect(30,0,140,24), "tf_but_new", "Nowa faktura [F5]", new BMessage(BUT_NEW), B_FOLLOW_LEFT|B_FOLLOW_TOP);
-	but_del = new BButton(BRect(30,510,140,534), "tf_but_del", "Usuń zaznaczone [F8]", new BMessage(BUT_DEL), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
-	but_restore = new BButton(BRect(235,510,325,534), "tf_but_restore", "Przywróć [F6]", new BMessage(BUT_RESTORE), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
-	but_save = new BButton(BRect(580,510,670,534), "tf_but_save", "Zapisz", new BMessage(BUT_SAVE), B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM);
-	but_print = new BButton(BRect(405,510,485,534), "tf_but_print", "Drukuj [F9]", new BMessage(BUT_PRINT), B_FOLLOW_LEFT_RIGHT|B_FOLLOW_BOTTOM);
+	but_new = new BButton(BRect(30,0,140,24), "tf_but_new", "New invoice [F5]", new BMessage(BUT_NEW), B_FOLLOW_LEFT|B_FOLLOW_TOP);
+	but_del = new BButton(BRect(30,510,140,534), "tf_but_del", "Delete selected [F8]", new BMessage(BUT_DEL), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
+	but_restore = new BButton(BRect(235,510,325,534), "tf_but_restore", "Restore [F6]", new BMessage(BUT_RESTORE), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
+	but_save = new BButton(BRect(580,510,670,534), "tf_but_save", "Save", new BMessage(BUT_SAVE), B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM);
+	but_print = new BButton(BRect(405,510,485,534), "tf_but_print", "Print [F9]", new BMessage(BUT_PRINT), B_FOLLOW_LEFT_RIGHT|B_FOLLOW_BOTTOM);
 	this->view->AddChild(but_new);
 	this->view->AddChild(but_del);
 	this->view->AddChild(but_restore);
@@ -140,12 +140,12 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db
 	viewogol->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	tabogol = new BTab(viewogol);
 	tbv2->AddTab(viewogol, tabogol);
-	tabogol->SetLabel("Dane ogólne [F10]");
+	tabogol->SetLabel("General data [F10]");
 	viewpozy = new BView(r, "tfviewpozy", B_FOLLOW_ALL_SIDES, 0);
 	viewpozy->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	tabpozy = new BTab(viewpozy);
 	tbv2->AddTab(viewpozy, tabpozy);
-	tabpozy->SetLabel("Pozycje [F11]");
+	tabpozy->SetLabel("Items [F11]");
 
 	initTab1();
 	initTab2();
@@ -165,18 +165,18 @@ tabFaktura::~tabFaktura() {
 
 void tabFaktura::initTab1(void) {
 //	views: 0,0,490,600
-	nazwa = new BTextControl(BRect(10,10,300,30), "tfna", "Nr faktury", NULL, new BMessage(DC));
+	nazwa = new BTextControl(BRect(10,10,300,30), "tfna", "Invoice No", NULL, new BMessage(DC));
 	viewogol->AddChild(nazwa);
 	// box1
 	box1 = new BBox(BRect(10,40,300,210),"tf1box1");
 	box1->SetLabel("");
 	viewogol->AddChild(box1);
 	// box1-stuff
-	ogol[0] = new BTextControl(BRect(10,10,280,30), "tfd0", "Miejsce wyst.", NULL, new BMessage(DC));
-	ogol[1] = new BTextControl(BRect(10,40,280,60), "tfd1", "Wystawił", NULL, new BMessage(DC));
-	ogol[2] = new BTextControl(BRect(10,70,250,90), "tfd2", "Data wyst.", NULL, new BMessage(DC));
-	ogol[3] = new BTextControl(BRect(10,100,250,120), "tfd3", "Data sprzedaży", NULL, new BMessage(DC));
-	ogol[4] = new BTextControl(BRect(10,130,250,150), "tfd4", "Środek transp.", NULL, new BMessage(DC));
+	ogol[0] = new BTextControl(BRect(10,10,280,30), "tfd0", "Location", NULL, new BMessage(DC));
+	ogol[1] = new BTextControl(BRect(10,40,280,60), "tfd1", "Posted", NULL, new BMessage(DC));
+	ogol[2] = new BTextControl(BRect(10,70,250,90), "tfd2", "Existence date", NULL, new BMessage(DC));
+	ogol[3] = new BTextControl(BRect(10,100,250,120), "tfd3", "Sales Date", NULL, new BMessage(DC));
+	ogol[4] = new BTextControl(BRect(10,130,250,150), "tfd4", "Transp agent.", NULL, new BMessage(DC));
 	box1->AddChild(ogol[0]);
 	box1->AddChild(ogol[1]);
 	box1->AddChild(ogol[2]);
@@ -206,9 +206,9 @@ void tabFaktura::initTab1(void) {
 	box2->SetLabel("Płatność");
 	viewogol->AddChild(box2);
 	// box2-stuff
-	ogol[5] = new BTextControl(BRect(10,20,150,40), "tfd5", "Forma", NULL, new BMessage(DC));
-	ogol[6] = new BTextControl(BRect(10,50,150,70), "tfd6", "Termin", NULL, new BMessage(DC));
-	ogol[7] = new BTextControl(BRect(200,50,270,70), "tfd7", "Dni", NULL, new BMessage(TERMCHANGE));
+	ogol[5] = new BTextControl(BRect(10,20,150,40), "tfd5", "Form", NULL, new BMessage(DC));
+	ogol[6] = new BTextControl(BRect(10,50,150,70), "tfd6", "Term", NULL, new BMessage(DC));
+	ogol[7] = new BTextControl(BRect(200,50,270,70), "tfd7", "Days", NULL, new BMessage(TERMCHANGE));
 	box2->AddChild(ogol[5]);
 	box2->AddChild(ogol[6]);
 	box2->AddChild(ogol[7]);
@@ -231,7 +231,7 @@ void tabFaktura::initTab1(void) {
 	box3->SetLabel("Zaliczka");
 	viewogol->AddChild(box3);
 	// box3-stuff
-	ogol[8] = new BTextControl(BRect(10,20,170,40), "tfd8", "Kwota (zł)", NULL, new BMessage(DC));
+	ogol[8] = new BTextControl(BRect(10,20,170,40), "tfd8", "Amount (PLN)", NULL, new BMessage(DC));
 	ogol[9] = new BTextControl(BRect(10,50,170,70), "tfd9", "Data", NULL, new BMessage(DC));
 	box3->AddChild(ogol[8]);
 	box3->AddChild(ogol[9]);
@@ -239,7 +239,7 @@ void tabFaktura::initTab1(void) {
 	msg->AddPointer("_datefield", ogol[9]);
 	cbut[3] = new BButton(BRect(180,50,200,70), "tfcbut3", "+", msg);
 	box3->AddChild(cbut[3]);
-	but_paid = new BButton(BRect(180,20,230,40), "tfbutpaid", "Zapłacono", new BMessage(BUT_PAID));
+	but_paid = new BButton(BRect(180,20,230,40), "tfbutpaid", "Paid", new BMessage(BUT_PAID));
 	box3->AddChild(but_paid);
 	but_paid->ResizeToPreferred();
 	// box4
@@ -247,10 +247,10 @@ void tabFaktura::initTab1(void) {
 	box4->SetLabel("Odbiorca");
 	viewogol->AddChild(box4);
 	// box1-stuff
-	data[0] = new BTextControl(BRect(10,15,270,35), "tfd0", "Nazwa", NULL, new BMessage(DC));
-	data[2] = new BTextControl(BRect(10,50,420,65), "tfd2", "Adres", NULL, new BMessage(DC));
-	data[3] = new BTextControl(BRect(10,80,150,95), "tfd3", "Kod", NULL, new BMessage(DC));
-	data[4] = new BTextControl(BRect(160,80,420,95), "tfd4", "Miejscowość", NULL, new BMessage(DC));
+	data[0] = new BTextControl(BRect(10,15,270,35), "tfd0", "Name", NULL, new BMessage(DC));
+	data[2] = new BTextControl(BRect(10,50,420,65), "tfd2", "Address", NULL, new BMessage(DC));
+	data[3] = new BTextControl(BRect(10,80,150,95), "tfd3", "Code", NULL, new BMessage(DC));
+	data[4] = new BTextControl(BRect(160,80,420,95), "tfd4", "City", NULL, new BMessage(DC));
 	data[5] = new BTextControl(BRect(10,110,200,125), "tfd5", "Tel.", NULL, new BMessage(DC));
 	data[6] = new BTextControl(BRect(210,110,420,125), "tfd6", "Email", NULL, new BMessage(DC));
 	box4->AddChild(data[0]);
@@ -266,7 +266,7 @@ void tabFaktura::initTab1(void) {
 	box4->AddChild(data[7]); box4->AddChild(data[8]);
 	box4->AddChild(data[9]); box4->AddChild(data[10]);
 	// firma-symbole
-	menusymbol = new BPopUpMenu("[wybierz]");
+	menusymbol = new BPopUpMenu("[choose]");
 	symbolRows = 0; symbolIds = NULL;
 	RefreshFirmaSymbols();
 	BMenuField *menusymbolField = new BMenuField(BRect(280,15,420,35), "tfmsymbol", "Symbol", menusymbol);
@@ -314,7 +314,7 @@ void tabFaktura::initTab2(void) {
 	int i;
 	// box5
 	box5 = new BBox(BRect(10,10,590,350),"tfbox5", B_FOLLOW_LEFT_RIGHT|B_FOLLOW_TOP);
-	box5->SetLabel("Pozycje");
+	box5->SetLabel("Positions");
 	viewpozy->AddChild(box5);
 	// box5-stuff
 	CLVContainerView *containerView;
@@ -330,15 +330,15 @@ void tabFaktura::initTab2(void) {
 	pozlist->SetSelectionMessage(new BMessage(PLIST_SEL));
 	// box6
 	box6 = new BBox(BRect(10,170,570,250), "tfbox6");
-	box6->SetLabel("Nowa pozycja");
+	box6->SetLabel("New item");
 	box5->AddChild(box6);
 	// box6-stuff
-	towar[0] = new BTextControl(BRect(10,15,190,35), "tftowar0", "Nazwa", NULL, new BMessage(DCT));
+	towar[0] = new BTextControl(BRect(10,15,190,35), "tftowar0", "Name", NULL, new BMessage(DCT));
 	towar[1] = new BTextControl(BRect(310,15,460,35), "tftowar1", "PKWiU", NULL, new BMessage(DCT));
-	towar[2] = new BTextControl(BRect(10,45,190,65), "tftowar2", "Cena netto (zł)", NULL, new BMessage(DCT));
-	towar[3] = new BTextControl(BRect(200,45,290,65), "tftowar3", "Rabat (%)", NULL, new BMessage(DCT));
-	towar[4] = new BTextControl(BRect(300,45,430,65), "tftowar4", "Ilość", NULL, new BMessage(DCT));
-	towar[5] = new BTextControl(BRect(440,45,500,65), "tftowar5", "jm", NULL, new BMessage(DCT));
+	towar[2] = new BTextControl(BRect(10,45,190,65), "tftowar2", "Net price (PLN)", NULL, new BMessage(DCT));
+	towar[3] = new BTextControl(BRect(200,45,290,65), "tftowar3", "Discount (%)", NULL, new BMessage(DCT));
+	towar[4] = new BTextControl(BRect(300,45,430,65), "tftowar4", "Quantity", NULL, new BMessage(DCT));
+	towar[5] = new BTextControl(BRect(440,45,500,65), "tftowar5", "iu", NULL, new BMessage(DCT));
 	box6->AddChild(towar[0]); box6->AddChild(towar[1]);
 	box6->AddChild(towar[2]); box6->AddChild(towar[3]);
 	box6->AddChild(towar[4]); box6->AddChild(towar[5]);
@@ -367,10 +367,10 @@ void tabFaktura::initTab2(void) {
 	BMenuField *menujmField = new BMenuField(BRect(505,45,555,65), "tfmf", NULL, menujm);
 	box6->AddChild(menujmField);
 	// box5-stuff-cont
-	but_psave = new BButton(BRect(10,260,70,290), "tf_but_psave", "Zapisz", new BMessage(BUT_PSAVE));
-	but_pnew = new BButton(BRect(310,260,370,290), "tf_but_pnew", "Nowy", new BMessage(BUT_PNEW));
-	but_pimport = new BButton(BRect(390,260,480,290), "tf_but_pimport", "Import z innej", new BMessage(BUT_PIMPORT));
-	but_pdel = new BButton(BRect(490,260,560,290), "tf_but_pdel", "Usuń", new BMessage(BUT_PDEL));
+	but_psave = new BButton(BRect(10,260,70,290), "tf_but_psave", "Save", new BMessage(BUT_PSAVE));
+	but_pnew = new BButton(BRect(310,260,370,290), "tf_but_pnew", "New", new BMessage(BUT_PNEW));
+	but_pimport = new BButton(BRect(390,260,480,290), "tf_but_pimport", "Import from other", new BMessage(BUT_PIMPORT));
+	but_pdel = new BButton(BRect(490,260,560,290), "tf_but_pdel", "Delete", new BMessage(BUT_PDEL));
 	box5->AddChild(but_psave);
 	box5->AddChild(but_pnew);
 	box5->AddChild(but_pimport);
@@ -382,12 +382,12 @@ void tabFaktura::initTab2(void) {
 
 	r.left = 10; r.right = 100; r.top = 290; r.bottom = 310;
 	s = r; s.OffsetBy(0,20);
-	box5->AddChild(new BStringView(r, "tf_ss0", "Cena jednost.")); r.OffsetBy(100,0);
-	box5->AddChild(new BStringView(r, "tf_ss1", "Cena brutto")); r.OffsetBy(80,0);
-	box5->AddChild(new BStringView(r, "tf_ss2", "Ilość")); r.OffsetBy(80,0);
-	box5->AddChild(new BStringView(r, "tf_ss3", "Wartość netto")); r.OffsetBy(80,0);
-	box5->AddChild(new BStringView(r, "tf_ss4", "Kwota VAT")); r.OffsetBy(80,0);
-	box5->AddChild(new BStringView(r, "tf_ss5", "Wartość brutto"));
+	box5->AddChild(new BStringView(r, "tf_ss0", "Unit Price.")); r.OffsetBy(100,0);
+	box5->AddChild(new BStringView(r, "tf_ss1", "Gross price")); r.OffsetBy(80,0);
+	box5->AddChild(new BStringView(r, "tf_ss2", "Quantity")); r.OffsetBy(80,0);
+	box5->AddChild(new BStringView(r, "tf_ss3", "Net Value")); r.OffsetBy(80,0);
+	box5->AddChild(new BStringView(r, "tf_ss4", "VAT amount")); r.OffsetBy(80,0);
+	box5->AddChild(new BStringView(r, "tf_ss5", "Gross Value"));
 	for (j=0;j<=5;j++) {
 		suma[j] = new BStringView(s, NULL, "???");
 		box5->AddChild(suma[j]);
@@ -398,7 +398,7 @@ void tabFaktura::initTab2(void) {
 	}
 	// box7
 	box7 = new BBox(BRect(10,360,590,435), "tfbox7");
-	box7->SetLabel("Uwagi");
+	box7->SetLabel("Comments");
 	viewpozy->AddChild(box7);
 	// box7-stuff
 	r = box7->Bounds();
@@ -407,7 +407,7 @@ void tabFaktura::initTab2(void) {
 	uwagi = new BTextView(r, "tfuwagi", s, B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW);
 	box7->AddChild(uwagi);
 	// payment
-	sumasuma = new BStringView(BRect(10,440,90,455), "tfssd", "Do zapłaty:");
+	sumasuma = new BStringView(BRect(10,440,90,455), "tfssd", "To Pay:");
 	viewpozy->AddChild(sumasuma);
 	BFont fontb(be_bold_font);
 	sumasuma->SetFont(&fontb);
@@ -416,7 +416,7 @@ void tabFaktura::initTab2(void) {
 	viewpozy->AddChild(sumasuma);
 	sumasuma->SetFont(&fontb);
 	// magazyn
-	box5->AddChild(magazyn = new BStringView(BRect(100,255,180,280), "tfmagd", "Magazyn:"));
+	box5->AddChild(magazyn = new BStringView(BRect(100,255,180,280), "tfmagd", "Warehouse:"));
 	magazyn->SetAlignment(B_ALIGN_RIGHT);
 	magazyn->SetFont(&fontb);
 	box5->AddChild(magazyn = new BStringView(BRect(180,255,300,280), "tfmag", NULL));
@@ -468,7 +468,7 @@ void tabFaktura::updateTab2(void) {
 		vatMenuItems[i]->SetMarked((vatIds[i] == curtowarvatid));
 	}
 	if (curtowarvatid < 0) {
-		menuvat->Superitem()->SetLabel("[wybierz]");
+		menuvat->Superitem()->SetLabel("[choose]");
 		return;
 	}
 	// validate numeric fields
@@ -532,7 +532,7 @@ void tabFaktura::makeNewForm(void) {
 	// unselect symbolmenu
 	for (int i=0;i<symbolRows;i++)
 		symbolMenuItems[i]->SetMarked(false);
-	menusymbol->Superitem()->SetLabel("[wybierz]");
+	menusymbol->Superitem()->SetLabel("[choose]");
 	// data sprzedaży, wystawienia
 	tmp = execSQL("SELECT DATE('now')");
 	curdata->ogol[2] = tmp;
@@ -561,9 +561,9 @@ void tabFaktura::makeNewForm(void) {
 		mies.Remove(0,5);
 		mies.Remove(2,mies.Length()-2);
 	}
-	// max z konfiguracji? i tak działa nieźle
+	// max from configuration? it works fine anyway
 	curmax = 0;
-	// nazwy wszystkich faktur z aktualnym rokiem i miesiacem
+	// names of all invoices with the current year and month
 	tmp = "SELECT nazwa FROM faktura WHERE data_wystawienia > '";
 	tmp += rok; tmp += "-"; tmp += mies; tmp += "-01' ORDER BY data_wystawienia";
 	sqlite_get_table(dbData, tmp.String(), &result, &nRows, &nCols, &dbErrMsg);
@@ -598,7 +598,7 @@ void tabFaktura::makeNewTowar(void) {
 	for (i=0;i<tsymbolRows;i++) {
 		tsymbolMenuItems[i]->SetMarked(false);
 	}
-	tmenusymbol->Superitem()->SetLabel("[wybierz]");
+	tmenusymbol->Superitem()->SetLabel("[choose]");
 	// clear widgets
 	for (i=0;i<=5;i++)
 		towar[i]->SetText("");
@@ -620,7 +620,7 @@ bool tabFaktura::validateTab(void) {
 
 	// numer/nazwa - niepuste
 	if (strlen(nazwa->Text()) == 0) {
-		error = new BAlert(APP_NAME, "Nie wpisano numeru faktury!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "Invoice number not entered!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		nazwa->MakeFocus();
 		return false;
@@ -630,21 +630,21 @@ bool tabFaktura::validateTab(void) {
 	sql = "SELECT id FROM faktura WHERE nazwa = '"; sql += tmp; sql += "'";
 	i = toint(execSQL(sql.String()));
 	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != 0) && (i != curdata->id))) {
-		error = new BAlert(APP_NAME, "Numer faktury nie jest unikalny!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "The invoice number is not unique!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		nazwa->MakeFocus();
 		return false;
 	}
 	// miejsce - niepuste
 	if (strlen(ogol[0]->Text()) == 0) {
-		error = new BAlert(APP_NAME, "Nie wpisano miejsca wystawienia faktury!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "The place of invoice issue has not been entered!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		ogol[0]->MakeFocus();
 		return false;
 	}
 	// wystawil - niepuste
 	if (strlen(ogol[1]->Text()) == 0) {
-		error = new BAlert(APP_NAME, "Nie wpisano wystawiającego fakturę.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "No invoice issuer entered.\nContinue?", "Yes", "No", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (error->Go() == 1) {
 			ogol[1]->MakeFocus();
 			return false;
@@ -652,14 +652,14 @@ bool tabFaktura::validateTab(void) {
 	}
 	// data wystawienia - niepuste
 	if (strlen(ogol[2]->Text()) == 0) {
-		error = new BAlert(APP_NAME, "Nie wpisano daty wystawienia faktury!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "The invoice issue date has not been entered!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		ogol[2]->MakeFocus();
 		return false;
 	}
 	// data sprzedazy - niepuste
 	if (strlen(ogol[3]->Text()) == 0) {
-		error = new BAlert(APP_NAME, "Nie wpisano daty sprzedaży!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "No sale date entered!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		ogol[3]->MakeFocus();
 		return false;
@@ -673,14 +673,14 @@ bool tabFaktura::validateTab(void) {
 	}
 	// termin zaplaty - niepusty
 	if (strlen(ogol[6]->Text()) == 0) {
-		error = new BAlert(APP_NAME, "Nie wpisano terminu zapłaty!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "No payment date has been entered!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		ogol[6]->MakeFocus();
 		return false;
 	}
 	// lista towarów niepusta
 	if ((faklista->start == faklista->end) && (faklista->start == NULL)) {
-		error = new BAlert(APP_NAME, "Na fakturze nie ma żadnej pozycji!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "There is no item on the invoice!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		tbv2->Select(1);
 		return false;	
@@ -688,7 +688,7 @@ bool tabFaktura::validateTab(void) {
 	// test odbiorcy
 	// adres - wszystkie dane
 	if ((strlen(data[2]->Text())==0) || (strlen(data[3]->Text())==0) || (strlen(data[4]->Text())==0)) {
-		error = new BAlert(APP_NAME, "Adres kontrahenta jest niepełny.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "The contractor's address is incomplete.\nContinue?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (error->Go() == 1) {
 			data[2]->MakeFocus();
 			return false;
@@ -696,7 +696,7 @@ bool tabFaktura::validateTab(void) {
 	}
 	// NIP - niepusty,poprawny
 	if (strlen(data[7]->Text())==0) {
-		error = new BAlert(APP_NAME, "Nie wpisano numeru NIP kontrahenta.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "The contractor's Tax Identification Number has not been entered.\nContinue?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (error->Go() == 1) {
 			data[7]->MakeFocus();
 			return false;
@@ -704,7 +704,7 @@ bool tabFaktura::validateTab(void) {
 	}
 	// REGON - niepusty,poprawny
 	if (strlen(data[8]->Text())==0) {
-		error = new BAlert(APP_NAME, "Nie wpisano numeru REGON kontrahenta.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "The contractor's REGON number has not been entered.\Continue?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (error->Go() == 1) {
 			data[8]->MakeFocus();
 			return false;
@@ -712,7 +712,7 @@ bool tabFaktura::validateTab(void) {
 	}
 	// nr konta - niepusty,poprawny
 	if (strlen(data[10]->Text())==0) {
-		error = new BAlert(APP_NAME, "Nie wpisanu numeru konta kontrahenta.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "The contractor's account number has not been entered.\nContinue?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (error->Go() == 1) {
 			data[10]->MakeFocus();
 			return false;
@@ -720,7 +720,7 @@ bool tabFaktura::validateTab(void) {
 	}
 	// nazwa - niepusta
 	if (strlen(data[0]->Text()) == 0) {
-		error = new BAlert(APP_NAME, "Nie wpisano nazwy kontrahenta!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "The contractor's name has not been entered!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		data[0]->MakeFocus();
 		return false;
@@ -752,7 +752,7 @@ bool tabFaktura::validateTab(void) {
 		}
 		// jeśli dane są różne - męczyć usera
 		if (j!=0) {
-			error = new BAlert(APP_NAME, "Dane kontrahenta z bazy różnią się z tymi wpisanymi na fakturze\nCo robić?.", "Uaktualnij bazę", "Uaktualnij fakturę", "Nic nie rób", B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			error = new BAlert(APP_NAME, "The contractor's details from the database differ from those entered on the invoice\nWhat to do?", "Update the database", "Update the invoice", "Do nothing", B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			int ret = error->Go();
 			switch(ret) {
 				case 0:	// fak->baza
@@ -787,7 +787,7 @@ bool tabFaktura::validateTowar(void) {
 		// pusta, ale jesli nie brudne dane, to znaczy ze nowy towar!
 		if (!towardirty)
 			return true;
-		error = new BAlert(APP_NAME, "Nie wpisano nazwy towaru!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "The name of the product has not been entered!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		towar[0]->MakeFocus();
 		return false;
@@ -802,13 +802,13 @@ bool tabFaktura::validateTowar(void) {
 	}
 	// jest na fakturze, ale czy to edycja, czy dodanie nowego?
 	if ((i > 0) && (towarmark<1)) {
-		error = new BAlert(APP_NAME, "Towar o tej nazwie już jest na fakturze!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "Goods with this name are already on the invoice!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		return false;
 	}
 	// pkwiu - ostrzeżenie że pusty
 	if (strlen(towar[1]->Text()) == 0) {
-		error = new BAlert(APP_NAME, "Nie wpisano kodu PKWiU towaru.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "The product's PKWiU code has not been entered.\Continue?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (error->Go() == 1) {
 			towar[1]->MakeFocus();
 			return false;
@@ -828,14 +828,14 @@ bool tabFaktura::validateTowar(void) {
 	sql = "SELECT 100*0"; sql += towar[4]->Text();
 	i = toint(execSQL(sql.String()));
 	if (i == 0) {
-		error = new BAlert(APP_NAME, "Sprzedawana ilość towaru jest równa zero!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "The quantity sold is zero!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		towar[4]->MakeFocus();
 		return false;
 	}
 	// jm - ostrzeżenie że pusty
 	if (strlen(towar[5]->Text()) == 0) {
-		error = new BAlert(APP_NAME, "Nie wybrano jednostki miary.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "No unit of measurement selected.\Continue?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (error->Go() == 1) {
 			towar[5]->MakeFocus();
 			return false;
@@ -843,7 +843,7 @@ bool tabFaktura::validateTowar(void) {
 	}
 	// stawka vat
 	if (curtowarvatid < 0) {
-		error = new BAlert(APP_NAME, "Nie wybrano stawki VAT!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "VAT rate not selected!, "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		return false;
 	}
@@ -874,7 +874,7 @@ bool tabFaktura::validateTowar(void) {
 		if (curtowarvatid != oldtowar->vatid) j++;					  // vatid
 		// jeśli dane są różne - męczyć usera
 		if (j!=0) {
-			error = new BAlert(APP_NAME, "Dane towaru z bazy różnią się z tymi wpisanymi na fakturze\nCo robić?.", "Uaktualnij bazę", "Uaktualnij fakturę", "Nic nie rób", B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			error = new BAlert(APP_NAME,"The product data from the database differs from those entered on the invoice\nWhat to do?", "Update the database", "Update the invoice", "Do nothing", B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			int ret = error->Go();
 			switch(ret) {
 				case 0:	// fak->baza
@@ -895,8 +895,8 @@ bool tabFaktura::validateTowar(void) {
 					break;
 			}
 		}
-		// sprawdzić stan magazynu, o ile to nie usługa
-		// i nie edytujemy starej faktury (data sprzedazy musi byc >= ostatnia zmiana mag)
+		// check the stock level, if it is not a service
+		// and we do not edit the old invoice (sales date must be >= last mag change)
 		if (!(oldtowar->usluga)) {
 			// if (data_sprzedazy)>=(data_ostatniej zmiany)
 			sql = "SELECT '"; sql += ogol[3]->Text(); sql += "' >= '"; sql += oldtowar->magzmiana; sql += "'";
@@ -911,7 +911,7 @@ bool tabFaktura::validateTowar(void) {
 					sql = "SELECT 0"; sql += oldtowar->magazyn; sql += "< 0"; sql += towar[4]->Text();
 				}
 				if (toint(execSQL(sql.String()))) {
-					error = new BAlert(APP_NAME, "Sprzedawana ilość jest większa od tej w magazynie.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+					error = new BAlert(APP_NAME, "The quantity sold is greater than that in stock.\nContinue?", "Yes", "No", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 					if (error->Go() == 1) {
 						towar[4]->MakeFocus();
 						return false;
@@ -1236,7 +1236,7 @@ void tabFaktura::RefreshIndexList(void) {
 bool tabFaktura::CommitCurtowar(void) {
 	if (!towardirty)
 		return true;
-	BAlert *ask = new BAlert(APP_NAME, "Zapisać zmiany w aktualnej pozycji?", "Tak", "Nie", "Anuluj", B_WIDTH_AS_USUAL, B_IDEA_ALERT);
+	BAlert *ask = new BAlert(APP_NAME, "Save changes to current position?", "Yes", "No", "Cancel", B_WIDTH_AS_USUAL, B_IDEA_ALERT);
 	int ret = ask->Go();
 	switch (ret) {
 		case 2:
