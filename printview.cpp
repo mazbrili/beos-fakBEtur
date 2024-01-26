@@ -1,10 +1,10 @@
 //
-// - niedrukowalne 'ż'/'Ż'(ółw) zastępowane z/Z
+// - unprintable 'ż'/'Ż'(turtle) replaced with/Z
 //
 // TODO:
-//	- info w dokumentacji jak zrobić embedding fontów w pdfwriterze
-//	- ustalić listę kilku fontów, które mają polskie literki - próbować po
-//		kolei, jak sprawdzać w BFont co zostało ustalone?
+// - info in the documentation on how to embedding fonts in PDFwriter
+// - create a list of several fonts that have Polish letters - try after
+// next, how to check in BFont what has been determined?
 //
 // IDEAS:
 //
@@ -19,8 +19,8 @@
 #include <Window.h>
 #include <stdio.h>
 
-const char *tabhline1[] = { "Lp.", "Nazwa towaru/usługi", "PKWiU", "Ilość", "J.m.", "Rabat", "Cena", "Wartość", "VAT", "Wartość", "Wartość", NULL };
-const char *tabhline2[] = { "",    "",                    "",      "",      "",     "(%)",   "z rabatem", "netto", "", "VAT", "brutto", NULL };
+const char *tabhline1[] = { "No.", "Name of goods/services", "PKWiU", "Quantity", "Unit", "Discount", "Price", "Value", "VAT", "Value ", "Value", NULL };
+const char *tabhline2[] = { "", "", "", "", "", "(%)", "with discount", "net", "", "VAT", "gross", NULL };
 const char *tabhline3[] = { "88",  "MMMMMMMMMMMMMMMMMM", "MM.MM.MM.MM", "88888.88", "MMMMM", "88.88", "88888.88", "888888.88", "88.88%", "888888.88", "888888.88", NULL };
 
 printView::printView(int id, sqlite *db, int numkopii, BMessage *pSettings) : beFakPrint(id,db,numkopii),
@@ -53,7 +53,7 @@ void printView::Go(void) {
 	// - wyswietlic
 	BRect r = pageRect;
 	r.OffsetBy(20,20);
-	pWindow = new BWindow(r, "Podgląd wydruku", B_TITLED_WINDOW, 0);
+	Window = new Window(r, "Print Preview", B TITLED WINDOW, 0);
 	pWindow->AddChild(this);
 	MoveTo(pageRect.LeftTop());
 	ResizeTo(pageRect.Width(),pageRect.Height());
@@ -61,7 +61,7 @@ void printView::Go(void) {
 //	return;	// XXX removeme!
 	printJob->BeginJob();
 	// for all pages...
-	printJob->DrawView(this,BRect(pageRect),BPoint(0.0,0.0));	// cala strona, od (0,0)
+	printJob->DrawView(this,BRect(pageRect),BPoint(0.0,0.0));	// whole page, from (0,0)
 	printJob->SpoolPage();
 	printJob->CommitJob();
 }
@@ -85,7 +85,7 @@ void printView::Draw(BRect pageRect) {
 	BString tmp;
 	BPoint cur;
 	int i, j;
-	// fonty: font - do napisów zywkłych, fontb - tytuły
+	// fonts: font - for regular subtitles, fontb - titles
 	BFont font(be_plain_font);
 	font.SetFamilyAndStyle("Arial","Regular");
 	font.SetFlags(B_DISABLE_ANTIALIASING);
@@ -182,7 +182,7 @@ void printView::Draw(BRect pageRect) {
 		MovePenTo(cur);
 		DrawStr(tmp);
 	}
-	// sposob zaplaty, data zaplaty, termin zaplaty, srodek transportu
+	// payment method, payment date, payment term, transport date
 	cur = PenLocation();
 	cur.y = ELINE; cur.y = ELINE;
 	tmp = "Sposób zapłaty: ";
@@ -200,14 +200,14 @@ void printView::Draw(BRect pageRect) {
 	DrawStr(tmp);
 	SetFont(&font);
 	cur.y = ELINE;
-	tmp = "Data sprzedaży: ";
+	tmp = "Sale date: ";
 	cur.x = pageRect.left+(pageRect.Width()/4)-font.StringWidth(tmp.String());
 	MovePenTo(cur);
 	DrawStr(tmp);
 	tmp = fdata->ogol[3];
 	DrawStr(tmp);
 	if (fdata->ogol[4].Length()>0) {
-		tmp = "Środek transportu: ";
+		tmp = "Mode of transportation: ";
 		cur.x = pageRect.left+(3*pageRect.Width()/4)-font.StringWidth(tmp.String());
 		MovePenTo(cur);
 		DrawStr(tmp);
@@ -215,8 +215,8 @@ void printView::Draw(BRect pageRect) {
 		DrawStr(tmp);
 	}
 	cur.y = ELINE;
-	// tabela header
-	// wygenerować szerokości
+	// header table
+	// generate widths
 	tabl[0] = 0;
 	float d;
 	for (i=0;i<=10;i++) {
@@ -263,7 +263,7 @@ void printView::Draw(BRect pageRect) {
 	font.SetSize(8.0);
 	SetFont(&font);
 	cur.x = tabl[0]; cur.y = tabhl1; cur.y = ELINE; MovePenTo(cur);
-	// iteruj po towarach
+	// iterate over the goods
 	pozfakitem *item = flist->start;
 	while (item!=NULL) {
 		tmp = ""; tmp << item->lp; font.TruncateString(&tmp, B_TRUNCATE_END, tabl[1]-tabl[0]-ALIGN_MARGIN);
@@ -301,7 +301,7 @@ void printView::Draw(BRect pageRect) {
 		DrawStrRight(tmp, tabl[8+j]);
 	}
 	// RAZEM (slowo)
-	tmp = "RAZEM:";
+	tmp = "TOTAL:";
 	DrawStrRight(tmp, tabl[7]);
 	float tabsumay1 = cur.y+2;
 	StrokeRect(BRect(tabl[7], tabsumay0, tabl[11], tabsumay1));
@@ -312,22 +312,22 @@ void printView::Draw(BRect pageRect) {
 	for (i=7;i<=10;i++)
 		AddLine(BPoint(tabl[i],tabsumay0), BPoint(tabl[i],tabsumay1), HighColor());
 	EndLineArray();
-	// do zaplaty
+	// before patching
 	cur.x = tabl[1]+(tabl[2]-tabl[1])/2;
 	MovePenTo(cur);
 	font.SetSize(10.0);
-	tmp = "Do zapłaty zł: ";
+	tmp = "To be paid in PLN: ";
 	DrawStrRight(tmp, cur.x);
 	tmp = razem.summa[3];
 	DrawStr(tmp);
-	// do zaplaty slownie
+	// before the patch verbal
 	cur.y = ELINE;
 	MovePenTo(cur);
-	tmp = "Słownie: ";
+	tmp = "In words: ";
 	DrawStrRight(tmp, cur.x);
 	tmp = slownie(razem.summa[3].String());
 	DrawStr(tmp);
-	// wystawil [wystawil] odebral
+	// he issued [issued] collected
 	// --------            -------
 	font.SetSize(10.0);
 	SetFont(&font);
@@ -349,12 +349,12 @@ void printView::Draw(BRect pageRect) {
 	MovePenTo(cur);
 	font.SetSize(5.0);
 	SetFont(&font);
-	tmp = "podpis osoby upow.";
+	tmp = "signature of the authorized person";
 	DrawStrCenter(tmp, cur.x, cur.x+pageRect.Width()/4);
 	
 	font.SetSize(10.0);
 	SetFont(&font);
-	tmp = "odebrał: ";
+	tmp = "picked up: ";
 	cur.x = pageRect.left + 5*(pageRect.Width()/8) - font.StringWidth(tmp.String());
 	cur.y = pageRect.bottom - 7 * font.Size();
 	MovePenTo(cur);
@@ -366,7 +366,7 @@ void printView::Draw(BRect pageRect) {
 	MovePenTo(cur);
 	font.SetSize(5.0);
 	SetFont(&font);
-	tmp = "podpis osoby upow.";
+	tmp = "signature of the authorized person. ";
 	DrawStrCenter(tmp, cur.x, cur.x+pageRect.Width()/4);
 }
 
