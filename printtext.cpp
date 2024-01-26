@@ -1,8 +1,8 @@
 //
 // TODO:
-//		usunąć niepotrzebne .String()?
+// remove unnecessary .String()?
 // IDEAS:
-//		szerokosci,parametry dla 80/136 do osobnej tabeli, indeksowac
+// widths, parameters for 80/136 to a separate table, indexed
 //
 
 #include "printtext.h"
@@ -29,13 +29,13 @@ void printText::Go(void) {
 	BString tmp, out, line, hline, hline2;
 
 	out = ""; line="", tmp = "";
-	//[1] nazwasprzedawcy .... miejscewyst,datawyst
+	//[1] sellername .... place of occurrence, date of occurrence
 	line = own[0].String();
 	tmp = fdata->ogol[0].String(); tmp += ", "; tmp += fdata->ogol[2];
 	line = rightAlign(line, tmp);
 	line += ELINE;
 	out += line;
-	//[2] kodsprz miejscesprz, adres sprz
+	//[2] equipment code, equipment location, equipment address
 	line = own[3].String(); line += " "; line += own[4].String();
 	line += ", "; line += own[2].String(); line += ELINE;
 	out += line;
@@ -54,7 +54,7 @@ void printText::Go(void) {
 	}
 	if (line.Length()>0) line += ELINE;
 	out += line;
-	//[6] [wolna/missing]
+	//[6] [single/missing]
 	out += ELINE;
 	//[7] [wolna]
 	out += ELINE;
@@ -67,8 +67,8 @@ void printText::Go(void) {
 	out += line;
 	//[10] [wolna]
 	out += ELINE;
-	//[11] Nabywca: [nabywca]
-	line = "Nabywca: "; line += fdata->odata[0].String(); line += ELINE;
+	//[11] Buyer: [buyer]
+	line = "Buyer: "; line += fdata->odata[0].String(); line += ELINE;
 	out += line;
 	//[12] Adres: [adresnab], [kodnab] [miejscnab]
 	line = "  Adres: "; line += fdata->odata[2].String(); line += ", "; line += fdata->odata[3]; line += " "; line += fdata->odata[4]; line += ELINE;
@@ -87,14 +87,14 @@ void printText::Go(void) {
 	//[14] [wolna]
 	out += ELINE;
 	//[15] sposob zaplaty [sposob]...termin zaplaty [termin]
-	line = "Sposób zapłaty: "; line += fdata->ogol[5];
-	tmp  = "Termin zapłaty: "; tmp += fdata->ogol[6];
+	line = "Method of payment: "; line += fdata->ogol[5];
+	tmp  = "Date of payment: "; tmp += fdata->ogol[6];
 	line = halfAlign(line, tmp);
 	line += ELINE;
 	out += line;
 	//[16] data sprzedazy [data]...srodek transportu [srodek]
-	line = "Data sprzedaży: "; line += fdata->ogol[3];
-	tmp  = "Środek transp.: "; tmp += fdata->ogol[4];
+	line = "Sale date: "; line += fdata->ogol[3];
+	tmp  = "Transp. medium: "; tmp += fdata->ogol[4];
 	line = halfAlign(line, tmp);
 	line += ELINE;
 	out += line;
@@ -107,9 +107,9 @@ void printText::Go(void) {
 		out += hline;
 		line = "|    |                                         |             |         |      |       |          |          |   |          |          |"; line += ELINE;
 		out += line;
-		line = "| Lp | Nazwa towaru/uslugi                     |    PKWiU    |  Ilosc  |  Jm  | Rabat |  Cena z  |  Wartosc |VAT|  Wartosc |  Wartosc |"; line += ELINE;
+		line = "| No |    Name of the product/service          |    PKWiU    | Quantity|  Jm  | Disc  | Price fr |  Value   |VAT|   Value  |   Value  |"; line += ELINE;
 		out += line;
-		line = "|    |                                         |             |         |      |  (%)  |  rabatem |    netto |   |    VAT   |   brutto |"; line += ELINE;
+		line = "|    |                                         |             |         |      |  (%)  | discount | net      |   | VAT      |   gross  |"; line += ELINE;
 		out += line;
 		out += hline;
 	} else {
@@ -182,7 +182,7 @@ void printText::Go(void) {
 	}
 	//[] stopka
 	out += hline;
-	// podsumuj
+	// summarize
 	makeSummary();
 	//[] wypisac podsumowanie
 	for (int i=0;i<fsummarows;i++) {
@@ -230,17 +230,17 @@ void printText::Go(void) {
 	//[] wolna
 	out += ELINE;
 	//[] Do zapłaty: [kwota], lub polaczone z RAZEM |
-	line = " Do zapłaty zł: "; line += razem.summa[3]; line += ELINE;
+	line = " To be paid in PLN: "; line += razem.summa[3]; line += ELINE;
 	out += line;
 	//[] Słownie: [kwota]     lib polaczone z +---+---+ pod razem
-	line = "       Słownie: "; line += slownie(razem.summa[3].String()); line += ELINE;
+	line = "       In words: "; line += slownie(razem.summa[3].String()); line += ELINE;
 	out += line;
 	//[] wolna x 3
 	out += ELINE; out += ELINE; out += ELINE;
 	//[] uwagi: [uwagi, multiline, wrap!]
 	//[] wystawil: [wystawil]...odebral:
-	line = "    wystawił: "; line += fdata->ogol[1];
-	tmp  = "odebrał: ";
+	line = "        issued: "; line += fdata->ogol[1];
+	tmp  = "received:";
 	line = halfAlign(line, tmp);
 	line += ELINE;
 	out += line;
@@ -251,8 +251,8 @@ void printText::Go(void) {
 	line += ELINE;
 	out += line;
 	//[]       podpis osoby upow.       podpis osoby upow.
-	line = "                podpis osoby upow.";
-	tmp  =      "           podpis osoby upow.";
+	line = "  signature of the authorized";
+	tmp  =      "signature of the authorized ";";
 	line = halfAlign(line, tmp);
 	line += ELINE;
 	out += line;
