@@ -105,7 +105,7 @@ void printView::Draw(BRect pageRect) {
 	tmp = own[0];
 	cur = PenLocation(); MovePenTo(LEFT, TOP);
 	DrawStr(tmp);
-	// dane sprzedawcy: kod miejsce, adres
+	// dane sprzedawcy: code miejsce, address
 	SetFont(&font);
 	tmp = own[3]; tmp += " "; tmp += own[4]; tmp += ", "; tmp += own[2];
 	cur = PenLocation(); MovePenTo(LEFT, ELINE);

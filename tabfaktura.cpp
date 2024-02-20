@@ -686,7 +686,7 @@ bool tabFaktura::validateTab(void) {
 		return false;	
 	}
 	// test odbiorcy
-	// adres - wszystkie dane
+	// address - wszystkie dane
 	if ((strlen(data[2]->Text())==0) || (strlen(data[3]->Text())==0) || (strlen(data[4]->Text())==0)) {
 		error = new BAlert(APP_NAME, "The contractor's address is incomplete.\nContinue?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (error->Go() == 1) {

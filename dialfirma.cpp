@@ -95,7 +95,7 @@ dialFirma::dialFirma(const char *title, sqlite *db, bool cancancel) : BWindow(
 	char **result;
 	BString sql;
 	sql = "SELECT ";
-	sql += "name, adres, kod, miejscowosc, telefon, email";
+	sql += "name, address, code, miejscowosc, telefon, email";
 	sql += ", nip, regon, bank, konto, f_wystawil";
 	sql += " FROM konfiguracja WHERE zrobiona = 1";
 //printf("sql:%s\n",sql.String());
@@ -122,7 +122,7 @@ void dialFirma::commit(void) {
 	int ret;
 //printf("commit");
 	sql = "UPDATE konfiguracja SET ";
-	sql += "name = %Q, adres = %Q, kod = %Q, miejscowosc = %Q, telefon = %Q, email = %Q";
+	sql += "name = %Q, address = %Q, code = %Q, miejscowosc = %Q, telefon = %Q, email = %Q";
 	sql += ", nip = %Q, regon = %Q, bank = %Q, konto = %Q, f_wystawil = %Q";
 	sql += " WHERE zrobiona = 1";
 //printf("sql:[%s]\n",sql.String());

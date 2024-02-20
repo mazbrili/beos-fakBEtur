@@ -1,23 +1,22 @@
-//
 // TODO:
-// - zrobić dwucyfrowe numery faktur?
-// - DECROUND może generować segfault! DECROUND(NULL+2)
-// - dwuklik na należności - powrót na fakturę
-// - sortowanie kolumn liczbowych z "XXX.XX" niepoprawne
-// - przemyśleć czy wszystkie kolumny w tabfaktura są potrzebne (pkwiu?)
-// - skróty klawiaturowe i ergonomia:
-//		- na fak/pozycje - ENTER raczej na zapis pozycji niż całości... (niekonsekwentne)
-// - wydruk - cennik
-// - usuń fakturę - nie uaktualnia stanu magazynu (niby czemu?)
-// - konfiguracja:
-//		- czy ostrzegać o wszystkich błędach?
-//		- txt: znak końca linii
-// - pole 'uwagi' w towar/faktura nie reaguje na zmiany
-// - usunąć duplikaty execSQL() - zrobic jakos globalnie?
-//		- dziedziczyc pusty befaktab (nie dla pochodnych dbdata)
+// - make two-digit invoice numbers?
+// - DECROUND may generate a segfault! DECROUND(NULL+2)
+// - double click on receivables - return to the invoice
+// - sorting of numeric columns from "XXX.XX" incorrect
+// - think about whether all columns in tabinvoice are needed (pkwiu?)
+// - keyboard shortcuts and ergonomics:
+// - for fak/positions - ENTER to save the position rather than the whole... (inconsistent)
+// - printout - price list
+// - delete invoice - does not update the inventory (why not?)
+// - configuration:
+// - whether to warn about all errors?
+// - txt: end of line character
+// - the 'comments' field in the product/invoice does not respond to changes
+// - remove duplicates execSQL() - do something global?
+// - inherit empty beftab (not for dbdata derivatives)
 //
-// zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
-// dziedziczyć z btab?
+// changing curtab and toggle is ugly, maybe the whole beFakTab should be
+// inherit from btab?
 
 #include "mainwindow.h"
 #include "dialfirma.h"
@@ -83,18 +82,18 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	menuBar = new BMenuBar(r, "menuBar");
 	mainView->AddChild(menuBar);
 
-	menu = new BMenu("Plik", B_ITEMS_IN_COLUMN);
-	menu->AddItem(new BMenuItem("O programie", new BMessage(MENU_ABOUT)));
+	menu = new BMenu("File", B_ITEMS_IN_COLUMN);
+	menu->AddItem(new BMenuItem("About program", new BMessage(MENU_ABOUT)));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Ustawienia strony", new BMessage(MENU_PAGESETUP)));
-	menu->AddItem(new BMenuItem("Zamknij", new BMessage(B_QUIT_REQUESTED), 'Q'));
+	menu->AddItem(new BMenuItem("Page setting", new BMessage(MENU_PAGESETUP)));
+	menu->AddItem(new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menuBar->AddItem(menu);
 
 	menu = new BMenu("Dokument", B_ITEMS_IN_COLUMN);
-	menu->AddItem(pmenuo = new BMenuItem("Oryginał", new BMessage(MENU_PRINTO)));
-	menu->AddItem(pmenuc = new BMenuItem("Kopia", new BMessage(MENU_PRINTC)));
+	menu->AddItem(pmenuo = new BMenuItem("Original", new BMessage(MENU_PRINTO)));
+	menu->AddItem(pmenuc = new BMenuItem("Copy", new BMessage(MENU_PRINTC)));
 	menu->AddItem(pmenud = new BMenuItem("Duplikat", new BMessage(MENU_PRINTD)));
-	menu->AddItem(pmenue = new BMenuItem("Oryginał+kopie", new BMessage(MENU_PRINTE)));
+	menu->AddItem(pmenue = new BMenuItem("Original+kopie", new BMessage(MENU_PRINTE)));
 	menuBar->AddItem(menu);
 
 	menu = new BMenu("Opcje", B_ITEMS_IN_COLUMN);
@@ -202,7 +201,7 @@ void BeFAKMainWindow::DoCheckConfig(void) {
 	char **result;
 	BString sql;
 	// select NAZWA and all config data
-	sql = "SELECT name, wersja, p_mode, p_typ, p_textcols, p_texteol, f_numprosta FROM konfiguracja WHERE zrobiona = 1";
+	sql = "SELECT name, version, p_mode, p_typ, p_textcols, p_texteol, f_numprosta FROM konfiguracja WHERE zrobiona = 1";
 //printf("sql:%s\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i\n", nRows, nCols);
@@ -215,11 +214,11 @@ void BeFAKMainWindow::DoCheckConfig(void) {
 			DoConfigFirma(false);
 		// read other config data from result
 		if (strcmp(result[i++], APP_DBVERSION)) {
-			sql = "Plik:\n"; sql += DATABASE_PATHNAME;
-			sql += "\nzawiera nieprawidłową (starszą) wersję bazy danych,\n";
-			sql += "proszę go usunąć i wprowadzić dane ponownie.\n";
-			sql += "Do czasu rozstrzygnięcia konkursu format bazy\n";
-			sql += "może jeszcze ulec zmianie!\n";
+			sql = "File:\n"; sql += DATABASE_PATHNAME;
+			sql += "\ncontains an invalid (older) version of the database,\n";
+			sql += "please delete it and enter your data again.\n";
+			sql += "Base format until the competition is resolved\n";
+			sql += "may still change!\n";
 			BAlert *error = new BAlert(APP_NAME, sql.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 			error->Go();
 			exit(2);

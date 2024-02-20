@@ -1,10 +1,10 @@
 //
-// obliczanie:
-// 1. w.brutto = round(ilość*c.brutto) = round(ilość*round(c.netto*stawka)) = 3.23
-// 2. w.brutto = round(stawka*ilość*c.netto) = 3.24 (3.235)
+// calculation:
+// 1. gross amount = round(quantity*gross amount) = round(number*round(net amount*rate)) = 3.23
+// 2. gross = round(rate*quantity*c.net) = 3.24 (3.235)
 //
-// 2. jest poprawny (wtedy w.netto*stawka = w.brutto!)
-// kwota vat = wbrutto-wnetto
+// 2. is correct (then w.net*rate = w.gross!)
+// VAT amount = gross-net
 
 #include "fakdata.h"
 
@@ -42,14 +42,14 @@ void firmadat::commit(void) {
 //printf("commit\n");
 	if (id>=0) {	// UPDATE
 		sql = "UPDATE firma SET ";
-		sql += "name = %Q, symbol = %Q, adres = %Q, kod = %Q, miejscowosc = %Q, telefon = %Q, email = %Q";
+		sql += "name = %Q, symbol = %Q, address = %Q, code = %Q, miejscowosc = %Q, telefon = %Q, email = %Q";
 		sql += ", nip = %Q, regon = %Q, bank = %Q, konto = %Q";
 		sql += ", odbiorca = %i, dostawca = %i, aktywny = %i, zablokowany = %i";
 		sql += " WHERE id = %i";
 	} else {		// INSERT
 		id = generate_id();
 		sql += "INSERT INTO firma ( ";
-		sql += "name, symbol, adres, kod, miejscowosc, telefon, email";
+		sql += "name, symbol, address, code, miejscowosc, telefon, email";
 		sql += ", nip, regon, bank, konto";
 		sql += ", odbiorca, dostawca, aktywny, zablokowany";
 		sql += ", id ) VALUES ( ";
@@ -75,7 +75,7 @@ void firmadat::fetch(void) {
 	char **result;
 	BString sql;	
 	sql = "SELECT ";
-	sql += "name, symbol, adres, kod, miejscowosc, telefon, email";
+	sql += "name, symbol, address, code, miejscowosc, telefon, email";
 	sql += ", nip, regon, bank, konto";
 	sql += ", odbiorca, dostawca, aktywny, zablokowany";
 	sql += " FROM firma WHERE id = ";

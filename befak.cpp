@@ -33,7 +33,7 @@ void BeFAKApp::MessageReceived(BMessage *msg) {
 }
 
 void BeFAKApp::AboutRequested(void) {
-	aboutDialog = new dialAbout("O programie");
+	aboutDialog = new dialAbout("About program");
 	aboutDialog->SetApplicationName(APP_NAME);
 	aboutDialog->SetVersionNumber(APP_VERSION);
 	aboutDialog->SetCopyrightString(B_UTF8_COPYRIGHT"2006 by Maciej Witkowiak");

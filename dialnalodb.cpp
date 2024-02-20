@@ -72,7 +72,7 @@ dialNalodb::dialNalodb(sqlite *db, const char *odb) : BWindow(
 	listr->SetSortFunction(CLVEasyItem::CompareItems);
 	boxr->AddChild(containerViewR);
 
-	view->AddChild(but_close = new BButton(BRect(540,440,620,470), "nalodbButClose", "Zamknij", new BMessage(BUT_CLOSE)));
+	view->AddChild(but_close = new BButton(BRect(540,440,620,470), "nalodbButClose", "Close", new BMessage(BUT_CLOSE)));
 	but_close->ResizeToPreferred();
 	but_close->MakeDefault(true);
 

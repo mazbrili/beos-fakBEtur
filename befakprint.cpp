@@ -30,7 +30,7 @@ beFakPrint::beFakPrint(int id, sqlite *db, int numkopii) {
 	BString sql;
 	sql = "SELECT p_typ, p_writepath, p_textcols";
 	sql += ", p_texteol, p_htmltemplate";
-	sql += ", name, adres, kod, miejscowosc, telefon, email";
+	sql += ", name, address, code, miejscowosc, telefon, email";
 	sql += ", nip, regon, bank, konto";
 	sql += " FROM konfiguracja WHERE zrobiona = 1";
 //printf("sql:%s\n",sql.String());
@@ -57,11 +57,11 @@ beFakPrint::beFakPrint(int id, sqlite *db, int numkopii) {
 			typfaktury = "Duplikat";
 			break;
 		case 1:
-			typfaktury = "Kopia";
+			typfaktury = "Copy";
 			break;
 		case 0:
 		default:
-			typfaktury = "Oryginał";
+			typfaktury = "Original";
 			break;
 	}
 
