@@ -81,7 +81,7 @@ void printHTML::Go(void) {
 	} else {
 		out.ReplaceAll("@SNIP@", "");
 	}
-	// faktura
+	// invoice
 	out.ReplaceAll("@FNUMER@", fdata->name.String());
 	out.ReplaceAll("@FTYP@", typfaktury.String());
 	out.ReplaceAll("@FMIEJSCEW@", fdata->ogol[0].String());
@@ -154,6 +154,6 @@ void printHTML::Go(void) {
 //printf("----------\n");
 //printf("%s\n",out.String());
 //printf("----------\n");
-	tmp = "faktura-"; tmp += makeName(); tmp += ".html";
+	tmp = "invoice-"; tmp += makeName(); tmp += ".html";
 	saveToFile(tmp.String(), &out);
 }

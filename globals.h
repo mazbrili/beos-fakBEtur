@@ -19,12 +19,12 @@
 	#define DATABASE_PATHNAME "/boot/home/config/settings/fakbetur.db"
 
 	// some globally visible stuff
-	#define MSG_REQTOWARUP		'RQTU'	// symbols in faktura
-	#define MSG_REQFIRMAUP		'RQFU'	// symbols in faktura
-	#define MSG_REQTOWARLIST	'RQTL'	// refresh towar list
+	#define MSG_REQTOWARUP		'RQTU'	// symbols in invoice
+	#define MSG_REQFIRMAUP		'RQFU'	// symbols in invoice
+	#define MSG_REQTOWARLIST	'RQTL'	// refresh commodity list
 	#define MSG_REQFIRMALIST	'RQFL'	// refresh firma list
-	#define MSG_REQFAKPOZLIST	'RQFT'	// refresh towar list on faktura, make dirty
-	#define MSG_REQVATUP		'RQVU'	// refresh vat menu - faktura, towar
-	#define MENU_PAGESETUP		'MPRS'	// in faktura - call printsetup
-	#define MENU_PRINTPAGE		'MPRP'	// by faktura's button only?
+	#define MSG_REQFAKPOZLIST	'RQFT'	// refresh commodity list on invoice, make dirty
+	#define MSG_REQVATUP		'RQVU'	// refresh vat menu - invoice, commodity
+	#define MENU_PAGESETUP		'MPRS'	// in invoice - call printsetup
+	#define MENU_PRINTPAGE		'MPRP'	// by invoice's button only?
 #endif

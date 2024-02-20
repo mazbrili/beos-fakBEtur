@@ -74,7 +74,7 @@ class tabFaktura : public beFakTab {
 		ColumnListView *list;
 
 		BTextControl *name;
-		BTextControl *ogol[10], *data[11], *towar[6];
+		BTextControl *ogol[10], *data[11], *commodity[6];
 		BStringView *suma[6];
 		BStringView *sumasuma, *magazyn;
 		BTextView *uwagi;

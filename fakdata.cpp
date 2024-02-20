@@ -123,7 +123,7 @@ int towardat::generate_id(void) {
 	int newid = 1;
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT MAX(id) FROM towar", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT MAX(id) FROM commodity", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows > 0) {
 		// there is something in db
 		newid = toint(result[1]) + 1;
@@ -137,7 +137,7 @@ void towardat::commit(void) {
 	int ret;
 //printf("commit\n");
 	if (id>=0) {	// UPDATE
-		sql = "UPDATE towar SET ";
+		sql = "UPDATE commodity SET ";
 		sql += "name = %Q, symbol = %Q, pkwiu = %Q, jm = %Q";
 		sql += ", usluga = %i, dodany = date('now'), notatki = %Q, vatid = %i";
 		sql += ", netto = %Q, zakupu = %Q, marza = %Q, rabat = %Q, kurs = %Q, clo = %Q";
@@ -145,7 +145,7 @@ void towardat::commit(void) {
 		sql += " WHERE id = %i";
 	} else {		// INSERT
 		id = generate_id();
-		sql += "INSERT INTO towar ( ";
+		sql += "INSERT INTO commodity ( ";
 		sql += "name, symbol, pkwiu, jm";
 		sql += ", usluga, dodany, notatki, vatid";
 		sql += ", netto, zakupu, marza, rabat";
@@ -181,7 +181,7 @@ void towardat::fetch(void) {
 	sql += ", usluga, dodany, notatki, vatid";
 	sql += ", netto, zakupu, marza, rabat, kurs, clo";
 	sql += ", magazyn, magzmiana";
-	sql += " FROM towar WHERE id = ";
+	sql += " FROM commodity WHERE id = ";
 	sql << id;
 //printf("sql:%s\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
@@ -205,7 +205,7 @@ void towardat::fetch(void) {
 
 void towardat::del(void) {
 	if (id>=0) {
-		sqlite_exec_printf(dbData, "DELETE FROM towar WHERE id = %i", 0, 0, &dbErrMsg, id);
+		sqlite_exec_printf(dbData, "DELETE FROM commodity WHERE id = %i", 0, 0, &dbErrMsg, id);
 	}
 	clear();
 }
@@ -268,7 +268,7 @@ int fakturadat::generate_id(void) {
 	int newid = 1;
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT MAX(id) FROM faktura", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT MAX(id) FROM invoice", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows > 0) {
 		// there is something in db
 		newid = toint(result[1]) + 1;
@@ -282,7 +282,7 @@ void fakturadat::commit(void) {
 	BString sql;
 	int ret;
 	if (id>=0) {	// UPDATE
-		sql = "UPDATE faktura SET ";
+		sql = "UPDATE invoice SET ";
 		sql += "name = %Q";
 		sql += ", miejsce_wystawienia = %Q, wystawil = %Q, data_wystawienia = %Q, data_sprzedazy = %Q";
 		sql += ", srodek_transportu = %Q, sposob_zaplaty = %Q, termin_zaplaty = %Q",
@@ -292,7 +292,7 @@ void fakturadat::commit(void) {
 		sql += " WHERE id = %i";
 	} else {		// INSERT
 		id = generate_id();
-		sql += "INSERT INTO faktura ( ";
+		sql += "INSERT INTO invoice ( ";
 		sql += "name";
 		sql += ", miejsce_wystawienia, wystawil, data_wystawienia, data_sprzedazy";
 		sql += ", srodek_transportu, sposob_zaplaty, termin_zaplaty";
@@ -332,7 +332,7 @@ void fakturadat::fetch(void) {
 	sql += ", zapl_kwota, zapl_dnia, uwagi";
 	sql += ", onazwa, oadres, okod, omiejscowosc, otelefon, oemail";
 	sql += ", onip, oregon, obank, okonto";
-	sql += " FROM faktura WHERE id = ";
+	sql += " FROM invoice WHERE id = ";
 	sql << id;
 //printf("sql:%s\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
@@ -355,7 +355,7 @@ void fakturadat::fetch(void) {
 
 void fakturadat::del(void) {
 	if (id>=0) {
-		sqlite_exec_printf(dbData, "DELETE FROM faktura WHERE id = %i", 0, 0, &dbErrMsg, id);
+		sqlite_exec_printf(dbData, "DELETE FROM invoice WHERE id = %i", 0, 0, &dbErrMsg, id);
 		sqlite_exec_printf(dbData, "DELETE FROM pozycjafakt WHERE fakturaid = %i", 0, 0, &dbErrMsg, id);
 	}
 	clear();
@@ -663,7 +663,7 @@ void pozfaklist::updateStorage(int fakturaid = -1) {
 	while (cur!=NULL) {
 		// get state
 		name = cur->data->data[1]; name.ReplaceAll("'","''"); name.Prepend("'"); name.Append("'");
-		sql = "SELECT usluga,magazyn FROM towar WHERE name = "; sql += name;
+		sql = "SELECT usluga,magazyn FROM commodity WHERE name = "; sql += name;
 		sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 		if (nRows<1) {
 			// nie ma takiego w bazie, nic nie robic
@@ -689,7 +689,7 @@ void pozfaklist::updateStorage(int fakturaid = -1) {
 //				printf("nowy mag[%s]: [%s]\n",name.String(), magazyn.String());
 				// update magazyn state (note that name() is already quoted)
 				ret = sqlite_exec_printf(dbData,
-					"UPDATE towar SET magazyn = %Q, magzmiana = DATE('now') WHERE name = %s",
+					"UPDATE commodity SET magazyn = %Q, magzmiana = DATE('now') WHERE name = %s",
 					0, 0, &dbErrMsg, magazyn.String(), name.String());
 //				printf("got:%i,%s\n",ret,dbErrMsg);
 			}

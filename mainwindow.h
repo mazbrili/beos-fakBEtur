@@ -67,7 +67,7 @@
 			int p_typ;			// 0 - orig, 1 - copy, 2 - dupl, 3 - or+copy
 			int p_textcols;		// 80/136
 			int p_texteol;		// 0 - CR+LF, 1 - LF, 2 - CR
-			// faktura settings
+			// invoice settings
 			bool f_numprosta;	// true - numeracja bez miesiąca
 
 			// tabs

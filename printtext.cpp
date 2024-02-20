@@ -261,7 +261,7 @@ void printText::Go(void) {
 //printf("---------------------\n");
 //printf("%s",out.String());
 //printf("---------------------\n");
-	tmp = "faktura-"; tmp += makeName(); tmp += ".txt";
+	tmp = "invoice-"; tmp += makeName(); tmp += ".txt";
 	saveToFile(tmp.String(), &out);
 }
 

@@ -74,7 +74,7 @@ void dialNaleznosci::DoFind(void) {
 			list->MakeEmpty();
 	}
 	// construct sql query
-	BString sql = "SELECT id, name, onazwa, termin_zaplaty, zapl_kwota FROM faktura WHERE ";
+	BString sql = "SELECT id, name, onazwa, termin_zaplaty, zapl_kwota FROM invoice WHERE ";
 	sql += "termin_zaplaty <= '";
 	sql += daysagostring(toint(daysago->Text()));
 	sql += "' ORDER BY termin_zaplaty";
@@ -89,7 +89,7 @@ void dialNaleznosci::DoFind(void) {
 		for (int i=1;i<=nRows;i++) {
 			// brutto 'do zaplaty'
 			sql = "SELECT DECROUND(SUM(DECROUND(DECROUND(DECROUND(p.netto*(100-p.rabat)/100.0)*p.ilosc)*(100+s.stawka)/100.0))) AS sumabrutto ";
-			sql += "FROM faktura AS f, pozycjafakt AS p, vat_rate AS s ";
+			sql += "FROM invoice AS f, pozycjafakt AS p, vat_rate AS s ";
 			sql += "WHERE p.fakturaid = f.id AND p.vatid = s.id AND f.id = ";
 			sql << result[i*nCols+0];
 			sqlite_get_table(dbData, sql.String(), &result2, &nRows2, &nCols2, &dbErrMsg);
@@ -120,7 +120,7 @@ void dialNaleznosci::DoPayFor(int item) {
 	tab5ListItem *it = ((tab5ListItem*)list->ItemAt(item));
 	if (it->Id() <= 0)
 		return;
-	BString sql = "UPDATE faktura SET zapl_kwota = DECROUND(0";
+	BString sql = "UPDATE invoice SET zapl_kwota = DECROUND(0";
 	sql += it->GetColumnContentText(3);
 	sql += "+0";
 	sql += it->GetColumnContentText(4);

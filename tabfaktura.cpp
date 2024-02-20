@@ -333,16 +333,16 @@ void tabFaktura::initTab2(void) {
 	box6->SetLabel("New item");
 	box5->AddChild(box6);
 	// box6-stuff
-	towar[0] = new BTextControl(BRect(10,15,190,35), "tftowar0", "Name", NULL, new BMessage(DCT));
-	towar[1] = new BTextControl(BRect(310,15,460,35), "tftowar1", "PKWiU", NULL, new BMessage(DCT));
-	towar[2] = new BTextControl(BRect(10,45,190,65), "tftowar2", "Net price (PLN)", NULL, new BMessage(DCT));
-	towar[3] = new BTextControl(BRect(200,45,290,65), "tftowar3", "Discount (%)", NULL, new BMessage(DCT));
-	towar[4] = new BTextControl(BRect(300,45,430,65), "tftowar4", "Quantity", NULL, new BMessage(DCT));
-	towar[5] = new BTextControl(BRect(440,45,500,65), "tftowar5", "iu", NULL, new BMessage(DCT));
-	box6->AddChild(towar[0]); box6->AddChild(towar[1]);
-	box6->AddChild(towar[2]); box6->AddChild(towar[3]);
-	box6->AddChild(towar[4]); box6->AddChild(towar[5]);
-	// towar-symbole
+	commodity[0] = new BTextControl(BRect(10,15,190,35), "tftowar0", "Name", NULL, new BMessage(DCT));
+	commodity[1] = new BTextControl(BRect(310,15,460,35), "tftowar1", "PKWiU", NULL, new BMessage(DCT));
+	commodity[2] = new BTextControl(BRect(10,45,190,65), "tftowar2", "Net price (PLN)", NULL, new BMessage(DCT));
+	commodity[3] = new BTextControl(BRect(200,45,290,65), "tftowar3", "Discount (%)", NULL, new BMessage(DCT));
+	commodity[4] = new BTextControl(BRect(300,45,430,65), "tftowar4", "Quantity", NULL, new BMessage(DCT));
+	commodity[5] = new BTextControl(BRect(440,45,500,65), "tftowar5", "iu", NULL, new BMessage(DCT));
+	box6->AddChild(commodity[0]); box6->AddChild(commodity[1]);
+	box6->AddChild(commodity[2]); box6->AddChild(commodity[3]);
+	box6->AddChild(commodity[4]); box6->AddChild(commodity[5]);
+	// commodity-symbole
 	tmenusymbol = new BPopUpMenu("[wybierz]");
 	tsymbolRows = 0; tsymbolIds = NULL;
 	RefreshTowarSymbols();
@@ -423,7 +423,7 @@ void tabFaktura::initTab2(void) {
 	magazyn->SetFont(&fontb);
 	// fix widths
 	for (i=0;i<=5;i++)
-		towar[i]->SetDivider(be_plain_font->StringWidth(towar[i]->Label())+5);
+		commodity[i]->SetDivider(be_plain_font->StringWidth(commodity[i]->Label())+5);
 	RefreshTowarList();
 }
 
@@ -472,13 +472,13 @@ void tabFaktura::updateTab2(void) {
 		return;
 	}
 	// validate numeric fields
-	towar[2]->SetText(validateDecimal(towar[2]->Text()));
-	towar[3]->SetText(validateDecimal(towar[3]->Text()));
-	towar[4]->SetText(validateDecimal(towar[4]->Text()));
+	commodity[2]->SetText(validateDecimal(commodity[2]->Text()));
+	commodity[3]->SetText(validateDecimal(commodity[3]->Text()));
+	commodity[4]->SetText(validateDecimal(commodity[4]->Text()));
 
 	// calculate data for summary suma[]
 	int nCols;
-	char **result = faklista->calcBrutto(towar[2]->Text(), towar[3]->Text(), towar[4]->Text(), curtowarvatid, &nCols);
+	char **result = faklista->calcBrutto(commodity[2]->Text(), commodity[3]->Text(), commodity[4]->Text(), curtowarvatid, &nCols);
 	if (nCols<1) {
 		for (int j=0;j<6;j++)
 			suma[j]->SetText("0.00");
@@ -489,13 +489,13 @@ void tabFaktura::updateTab2(void) {
 	faklista->calcBruttoFin(result);
 	// retr magazyn state
 	BString sql, name;
-	name = towar[0]->Text(); name.ReplaceAll("'","''"); name.Prepend("'"); name.Append("'");
-	sql = "SELECT usluga FROM towar WHERE name = "; sql += name;
+	name = commodity[0]->Text(); name.ReplaceAll("'","''"); name.Prepend("'"); name.Append("'");
+	sql = "SELECT usluga FROM commodity WHERE name = "; sql += name;
 	if (!toint(execSQL(sql.String()))) {
-		sql = "SELECT magazyn FROM towar WHERE name = "; sql += name;
+		sql = "SELECT magazyn FROM commodity WHERE name = "; sql += name;
 		sql = execSQL(sql.String());
 		sql += " ";
-		sql += towar[5]->Text();
+		sql += commodity[5]->Text();
 	}
 	else
 		sql = "[usługa]";
@@ -564,7 +564,7 @@ void tabFaktura::makeNewForm(void) {
 	// max from configuration? it works fine anyway
 	curmax = 0;
 	// names of all invoices with the current year and month
-	tmp = "SELECT name FROM faktura WHERE data_wystawienia > '";
+	tmp = "SELECT name FROM invoice WHERE data_wystawienia > '";
 	tmp += rok; tmp += "-"; tmp += mies; tmp += "-01' ORDER BY data_wystawienia";
 	sqlite_get_table(dbData, tmp.String(), &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
@@ -601,7 +601,7 @@ void tabFaktura::makeNewTowar(void) {
 	tmenusymbol->Superitem()->SetLabel("[choose]");
 	// clear widgets
 	for (i=0;i<=5;i++)
-		towar[i]->SetText("");
+		commodity[i]->SetText("");
 	for (i=0;i<=5;i++)
 		suma[i]->SetText("");
 	magazyn->SetText("");
@@ -627,7 +627,7 @@ bool tabFaktura::validateTab(void) {
 	}
 	// numer/name - unikalne
 	tmp = name->Text(); tmp.ReplaceAll("'","''");	// sql quote
-	sql = "SELECT id FROM faktura WHERE name = '"; sql += tmp; sql += "'";
+	sql = "SELECT id FROM invoice WHERE name = '"; sql += tmp; sql += "'";
 	i = toint(execSQL(sql.String()));
 	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != 0) && (i != curdata->id))) {
 		error = new BAlert(APP_NAME, "The invoice number is not unique!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
@@ -783,20 +783,20 @@ bool tabFaktura::validateTowar(void) {
 	BString sql, tmp;
 	int i;
 	// name niepusta?
-	if (strlen(towar[0]->Text()) == 0) {
-		// pusta, ale jesli nie brudne dane, to znaczy ze nowy towar!
+	if (strlen(commodity[0]->Text()) == 0) {
+		// pusta, ale jesli nie brudne dane, to znaczy ze nowy commodity!
 		if (!towardirty)
 			return true;
 		error = new BAlert(APP_NAME, "The name of the product has not been entered!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
-		towar[0]->MakeFocus();
+		commodity[0]->MakeFocus();
 		return false;
 	}
 	// name - unikalna na fakturze
 	pozfakitem *cur = faklista->start;
 	i = 0;
 	while (cur!=NULL) {
-		if (!strcmp(cur->data->data[1].String(), towar[0]->Text()))
+		if (!strcmp(cur->data->data[1].String(), commodity[0]->Text()))
 			i++;
 		cur = cur->nxt;
 	}
@@ -807,37 +807,37 @@ bool tabFaktura::validateTowar(void) {
 		return false;
 	}
 	// pkwiu - ostrzeżenie że pusty
-	if (strlen(towar[1]->Text()) == 0) {
+	if (strlen(commodity[1]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "The product's PKWiU code has not been entered.\Continue?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (error->Go() == 1) {
-			towar[1]->MakeFocus();
+			commodity[1]->MakeFocus();
 			return false;
 		}
 	}
 	// cena niezerowa
-	sql = "SELECT 100*0"; sql += towar[2]->Text();
+	sql = "SELECT 100*0"; sql += commodity[2]->Text();
 	i = toint(execSQL(sql.String()));
 	if (i == 0) {
 		error = new BAlert(APP_NAME, "Cena towaru jest równa zero.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (error->Go() == 1) {
-			towar[2]->MakeFocus();
+			commodity[2]->MakeFocus();
 			return false;
 		}
 	}
 	// ilosc niezerowa
-	sql = "SELECT 100*0"; sql += towar[4]->Text();
+	sql = "SELECT 100*0"; sql += commodity[4]->Text();
 	i = toint(execSQL(sql.String()));
 	if (i == 0) {
 		error = new BAlert(APP_NAME, "The quantity sold is zero!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
-		towar[4]->MakeFocus();
+		commodity[4]->MakeFocus();
 		return false;
 	}
 	// jm - ostrzeżenie że pusty
-	if (strlen(towar[5]->Text()) == 0) {
+	if (strlen(commodity[5]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "No unit of measurement selected.\Continue?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (error->Go() == 1) {
-			towar[5]->MakeFocus();
+			commodity[5]->MakeFocus();
 			return false;
 		}
 	}
@@ -848,16 +848,16 @@ bool tabFaktura::validateTowar(void) {
 		return false;
 	}
 	// name - nowa w bazie?
-	tmp = towar[0]->Text(); tmp.ReplaceAll("'","''");	// sql quote
-	sql = "SELECT id FROM towar WHERE name = '"; sql += tmp; sql += "'";
+	tmp = commodity[0]->Text(); tmp.ReplaceAll("'","''");	// sql quote
+	sql = "SELECT id FROM commodity WHERE name = '"; sql += tmp; sql += "'";
 	i = toint(execSQL(sql.String()));
 	if (i == 0) {
 		towardat *newtowar = new towardat(dbData);
 		newtowar->id = -1;
-		newtowar->data[0] = towar[0]->Text();	// name
-		newtowar->data[2] = towar[1]->Text();	// pkwiu
-		newtowar->data[3] = towar[5]->Text();	// jm
-		newtowar->ceny[0] = towar[2]->Text();	// cena netto
+		newtowar->data[0] = commodity[0]->Text();	// name
+		newtowar->data[2] = commodity[1]->Text();	// pkwiu
+		newtowar->data[3] = commodity[5]->Text();	// jm
+		newtowar->ceny[0] = commodity[2]->Text();	// cena netto
 		newtowar->vatid = curtowarvatid;		// vatid
 		dialSymbol *sym = new dialSymbol(dbData, true, (dbdat*)newtowar, handler);
 		sym->Show();
@@ -868,9 +868,9 @@ bool tabFaktura::validateTowar(void) {
 		int j = 0;
 		oldtowar->id = i;
 		oldtowar->fetch();
-		if (strcmp(towar[1]->Text(),oldtowar->data[2].String())) j++; // pkwiu
-		if (strcmp(towar[5]->Text(),oldtowar->data[3].String())) j++; // jm
-		if (strcmp(towar[2]->Text(),oldtowar->ceny[0].String())) j++; // netto
+		if (strcmp(commodity[1]->Text(),oldtowar->data[2].String())) j++; // pkwiu
+		if (strcmp(commodity[5]->Text(),oldtowar->data[3].String())) j++; // jm
+		if (strcmp(commodity[2]->Text(),oldtowar->ceny[0].String())) j++; // netto
 		if (curtowarvatid != oldtowar->vatid) j++;					  // vatid
 		// jeśli dane są różne - męczyć usera
 		if (j!=0) {
@@ -878,16 +878,16 @@ bool tabFaktura::validateTowar(void) {
 			int ret = error->Go();
 			switch(ret) {
 				case 0:	// fak->baza
-					oldtowar->data[2] = towar[1]->Text();
-					oldtowar->data[3] = towar[5]->Text();
-					oldtowar->ceny[0] = towar[2]->Text();
+					oldtowar->data[2] = commodity[1]->Text();
+					oldtowar->data[3] = commodity[5]->Text();
+					oldtowar->ceny[0] = commodity[2]->Text();
 					oldtowar->vatid = curtowarvatid;
 					oldtowar->commit();
 					break;
 				case 1: // baza->fak
-					towar[1]->SetText(oldtowar->data[2].String());
-					towar[2]->SetText(oldtowar->ceny[0].String());
-					towar[5]->SetText(oldtowar->data[3].String());
+					commodity[1]->SetText(oldtowar->data[2].String());
+					commodity[2]->SetText(oldtowar->ceny[0].String());
+					commodity[5]->SetText(oldtowar->data[3].String());
 					curtowarvatid = oldtowar->vatid;
 					break;
 				case 2:	// nothing
@@ -903,17 +903,17 @@ bool tabFaktura::validateTowar(void) {
 			if (toint(execSQL(sql.String()))) {
 				if (curdata->id>0) {
 					// magazyn+starafaktura < nowa?
-					sql = "SELECT (0"; sql += oldtowar->magazyn; sql += "+ilosc < 0"; sql += towar[4]->Text();
+					sql = "SELECT (0"; sql += oldtowar->magazyn; sql += "+ilosc < 0"; sql += commodity[4]->Text();
 					sql += ") FROM pozycjafakt WHERE fakturaid = "; sql << curdata->id;
 					sql += " AND name = '"; sql += oldtowar->data[0]; sql += "'";
 				} else {
 					// magazyn < nowa?
-					sql = "SELECT 0"; sql += oldtowar->magazyn; sql += "< 0"; sql += towar[4]->Text();
+					sql = "SELECT 0"; sql += oldtowar->magazyn; sql += "< 0"; sql += commodity[4]->Text();
 				}
 				if (toint(execSQL(sql.String()))) {
 					error = new BAlert(APP_NAME, "The quantity sold is greater than that in stock.\nContinue?", "Yes", "No", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 					if (error->Go() == 1) {
-						towar[4]->MakeFocus();
+						commodity[4]->MakeFocus();
 						return false;
 					}
 				}
@@ -1038,7 +1038,7 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 		case BUT_PIMPORT:
 			{
 				dialImport *di = new dialImport(dbData, curdata->id, faklista, handler);
-				di->Show();	// go? block here? XXX lock faktura change/new/refresh?
+				di->Show();	// go? block here? XXX lock invoice change/new/refresh?
 				break;
 			}
 // from tab2
@@ -1051,21 +1051,21 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			if (Message->FindInt32("_towarid", &item) == B_OK) {
 				curtowar->id = item;
 				curtowar->fetch();
-				towar[0]->SetText(curtowar->data[0].String());
-				towar[1]->SetText(curtowar->data[2].String());
-				towar[2]->SetText(curtowar->ceny[0].String());
-				towar[3]->SetText(curtowar->ceny[3].String());
-				towar[4]->SetText("0");
-				towar[5]->SetText(curtowar->data[3].String());
+				commodity[0]->SetText(curtowar->data[0].String());
+				commodity[1]->SetText(curtowar->data[2].String());
+				commodity[2]->SetText(curtowar->ceny[0].String());
+				commodity[3]->SetText(curtowar->ceny[3].String());
+				commodity[4]->SetText("0");
+				commodity[5]->SetText(curtowar->data[3].String());
 				curtowarvatid = curtowar->vatid;
 				updateTab2();
-				towar[4]->MakeFocus();
+				commodity[4]->MakeFocus();
 				this->dirty = true;
 				towardirty = true;
 			}
 		case MENUJM:
 			if (Message->FindString("_jm", &tmp) == B_OK) {
-				towar[5]->SetText(tmp);
+				commodity[5]->SetText(tmp);
 				this->dirty = true;
 				towardirty = true;
 			}
@@ -1159,13 +1159,13 @@ void tabFaktura::ChangedTowarSelection(int newid) {
 	pozfakdata *item = faklista->itemat(newid);
 	if (item != NULL) {
 		// fetch data into widgets
-		towar[0]->SetText(item->data[1].String());	// name
-		towar[1]->SetText(item->data[2].String());	// pkwiu
-		towar[4]->SetText(item->data[3].String());	// ilosc
-		towar[5]->SetText(item->data[4].String());	// jm
-		towar[3]->SetText(item->data[5].String());	// rabat
+		commodity[0]->SetText(item->data[1].String());	// name
+		commodity[1]->SetText(item->data[2].String());	// pkwiu
+		commodity[4]->SetText(item->data[3].String());	// ilosc
+		commodity[5]->SetText(item->data[4].String());	// jm
+		commodity[3]->SetText(item->data[5].String());	// rabat
 		curtowarvatid = item->vatid;				// vatid
-		towar[2]->SetText(item->data[11].String());	// cnetto
+		commodity[2]->SetText(item->data[11].String());	// cnetto
 		updateTab2();
 	} else {
 //printf("null item after selchg, happens after all-delete\n");
@@ -1222,7 +1222,7 @@ void tabFaktura::RefreshIndexList(void) {
 	// select list from db
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT id, name, data_sprzedazy FROM faktura ORDER BY data_sprzedazy, name", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT id, name, data_sprzedazy FROM invoice ORDER BY data_sprzedazy, name", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {
@@ -1257,7 +1257,7 @@ bool tabFaktura::DoCommitTowardata(void) {
 
 	if (!(validateTowar()))
 		return false;
-	if (strlen(towar[0]->Text()) == 0)		// against adding empty after 'new'
+	if (strlen(commodity[0]->Text()) == 0)		// against adding empty after 'new'
 		return true;
 	if (towarmark < 0) {
 		// nowa pozycja
@@ -1267,23 +1267,23 @@ bool tabFaktura::DoCommitTowardata(void) {
 	}
 	// zapisz pola danych
 	newdata->data[0] = "0";					// lp
-	newdata->data[1] = towar[0]->Text();	// name
-	newdata->data[2] = towar[1]->Text();	// pkwiu
-	newdata->data[3] = towar[4]->Text();	// ilosc
-	newdata->data[4] = towar[5]->Text();	// jm
-	newdata->data[5] = towar[3]->Text();	// rabat %
+	newdata->data[1] = commodity[0]->Text();	// name
+	newdata->data[2] = commodity[1]->Text();	// pkwiu
+	newdata->data[3] = commodity[4]->Text();	// ilosc
+	newdata->data[4] = commodity[5]->Text();	// jm
+	newdata->data[5] = commodity[3]->Text();	// rabat %
 	newdata->data[6] = suma[0]->Text();		// cena jedn. (po rabacie)
 	newdata->data[7] = suma[3]->Text();		// w.netto
 	newdata->vatid = curtowarvatid;			// stawka vat, update data[8]
 	newdata->data[9] = suma[4]->Text();		// kwota vat
 	newdata->data[10] = suma[5]->Text();	// w.brutto
-	newdata->data[11] = towar[2]->Text();	// c.netto
+	newdata->data[11] = commodity[2]->Text();	// c.netto
 	sql = "SELECT name FROM vat_rate WHERE id = "; sql << curtowarvatid;
 	newdata->data[8] = execSQL(sql.String());
 	// dodaj do listy
 	if (towarmark < 0)
 		faklista->addlast(newdata);
-	// nowy towar, wyczyść pola
+	// nowy commodity, wyczyść pola
 	makeNewTowar();
 	// update listy
 	faklista->setlp();
@@ -1356,7 +1356,7 @@ void tabFaktura::RefreshTowarSymbols(void) {
 	char **result;
 	BMessage *msg;
 
-	sqlite_get_table(dbData, "SELECT id, symbol FROM towar ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT id, symbol FROM commodity ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// empty table
 	} else {

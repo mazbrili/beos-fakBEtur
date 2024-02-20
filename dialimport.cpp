@@ -47,7 +47,7 @@ dialImport::dialImport(sqlite *db, int aktualna, pozfaklist *faklista, BHandler 
 	// select list from db
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT id, name, data_sprzedazy FROM faktura ORDER BY data_sprzedazy, name", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT id, name, data_sprzedazy FROM invoice ORDER BY data_sprzedazy, name", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {
@@ -70,7 +70,7 @@ bool dialImport::commit(void) {
 	i = list->CurrentSelection(0);
 	if (i<0)
 		return false;
-	// fetch list from selected faktura
+	// fetch list from selected invoice
 	fakturadat *olddata = new fakturadat(dbData);
 	pozfaklist *olista = new pozfaklist(dbData);
 	pozfakdata *curdata;

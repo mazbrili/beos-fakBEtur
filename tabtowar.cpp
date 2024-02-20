@@ -265,7 +265,7 @@ bool tabTowar::validateTab(void) {
 	}
 	// name - unikalna
 	tmp = data[0]->Text(); tmp.ReplaceAll("'","''");	// sql quote
-	sql = "SELECT id FROM towar WHERE name = '"; sql += tmp; sql += "'";
+	sql = "SELECT id FROM commodity WHERE name = '"; sql += tmp; sql += "'";
 	i = toint(execSQL(sql.String()));
 	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != 0) && (i != curdata->id))) {
 		error = new BAlert(APP_NAME, "Nazwa towaru nie jest unikalna!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
@@ -282,7 +282,7 @@ bool tabTowar::validateTab(void) {
 	}
 	// symbol - unikalny
 	tmp = data[1]->Text(); tmp.ReplaceAll("'","''");	// sql quote
-	sql = "SELECT id FROM towar WHERE symbol = '"; sql += tmp; sql += "'";
+	sql = "SELECT id FROM commodity WHERE symbol = '"; sql += tmp; sql += "'";
 	i = toint(execSQL(sql.String()));
 	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != 0) && (i != curdata->id))) {
 		error = new BAlert(APP_NAME, "Symbol towaru nie jest unikalny!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
@@ -504,7 +504,7 @@ void tabTowar::RefreshIndexList(void) {
 	// select list from db
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT id, symbol, name FROM towar ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT id, symbol, name FROM commodity ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {

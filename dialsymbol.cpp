@@ -64,7 +64,7 @@ bool dialSymbol::commit(void) {
 		return false;
 	}
 
-	table = (istowar) ? "towar" : "firma";
+	table = (istowar) ? "commodity" : "firma";
 	tmp = symbol->Text(); tmp.ReplaceAll("'","''");	// sql quote
 	sql = "SELECT id FROM "; sql += table; sql += " WHERE symbol = '"; sql += tmp; sql += "'";
 	// unique?
