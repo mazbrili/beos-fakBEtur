@@ -64,7 +64,7 @@
 			BMenuItem *fmenunum;
 			// print settings
 			int p_mode;			// 0 - print_server, 1 - text, 2 - html
-			int p_typ;			// 0 - orig, 1 - kopie, 2 - dupl, 3 - or+kopie
+			int p_typ;			// 0 - orig, 1 - copy, 2 - dupl, 3 - or+copy
 			int p_textcols;		// 80/136
 			int p_texteol;		// 0 - CR+LF, 1 - LF, 2 - CR
 			// faktura settings

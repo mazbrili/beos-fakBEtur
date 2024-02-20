@@ -16,7 +16,7 @@ const uint32 BUT_IMPORT =	'DIIM';
 
 dialImport::dialImport(sqlite *db, int aktualna, pozfaklist *faklista, BHandler *hr) : BWindow(
 	BRect(100, 100, 290, 480),
-	"Dokument do importu",
+	"Document to import",
 	B_TITLED_WINDOW,
 	B_NOT_RESIZABLE ) {
 

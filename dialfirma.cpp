@@ -33,7 +33,7 @@ dialFirma::dialFirma(const char *title, sqlite *db, bool cancancel) : BWindow(
 	view->AddChild(box1);
 	// box2
 	box2 = new BBox(BRect(10,180,450,330), "firma_box2");
-	box2->SetLabel("Dane firmy");
+	box2->SetLabel("Data firm");
 	view->AddChild(box2);
 	// XXX this is ripped from tabfirma!
 	// box1-stuff
@@ -97,7 +97,7 @@ dialFirma::dialFirma(const char *title, sqlite *db, bool cancancel) : BWindow(
 	sql = "SELECT ";
 	sql += "name, address, code, miejscowosc, telefon, email";
 	sql += ", nip, regon, bank, konto, f_wystawil";
-	sql += " FROM konfiguracja WHERE zrobiona = 1";
+	sql += " FROM configuration WHERE done = 1";
 //printf("sql:%s\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i\n", nRows, nCols);
@@ -121,10 +121,10 @@ void dialFirma::commit(void) {
 	BString sql;
 	int ret;
 //printf("commit");
-	sql = "UPDATE konfiguracja SET ";
+	sql = "UPDATE configuration SET ";
 	sql += "name = %Q, address = %Q, code = %Q, miejscowosc = %Q, telefon = %Q, email = %Q";
 	sql += ", nip = %Q, regon = %Q, bank = %Q, konto = %Q, f_wystawil = %Q";
-	sql += " WHERE zrobiona = 1";
+	sql += " WHERE done = 1";
 //printf("sql:[%s]\n",sql.String());
 	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
 		data[0]->Text(), data[2]->Text(), data[3]->Text(),

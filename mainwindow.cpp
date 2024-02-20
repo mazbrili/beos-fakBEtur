@@ -89,33 +89,33 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	menu->AddItem(new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menuBar->AddItem(menu);
 
-	menu = new BMenu("Dokument", B_ITEMS_IN_COLUMN);
+	menu = new BMenu("Document", B_ITEMS_IN_COLUMN);
 	menu->AddItem(pmenuo = new BMenuItem("Original", new BMessage(MENU_PRINTO)));
 	menu->AddItem(pmenuc = new BMenuItem("Copy", new BMessage(MENU_PRINTC)));
-	menu->AddItem(pmenud = new BMenuItem("Duplikat", new BMessage(MENU_PRINTD)));
-	menu->AddItem(pmenue = new BMenuItem("Original+kopie", new BMessage(MENU_PRINTE)));
+	menu->AddItem(pmenud = new BMenuItem("Duplicate", new BMessage(MENU_PRINTD)));
+	menu->AddItem(pmenue = new BMenuItem("Original+copy", new BMessage(MENU_PRINTE)));
 	menuBar->AddItem(menu);
 
-	menu = new BMenu("Opcje", B_ITEMS_IN_COLUMN);
-	menu->AddItem(new BMenuItem("Dane firmy", new BMessage(MENU_CONFFIRMA)));
-	menu->AddItem(new BMenuItem("Stawki VAT", new BMessage(MENU_CONFVAT)));
-	menu->AddItem(new BMenuItem("Termin płatności", new BMessage(MENU_PAYDAY)));
+	menu = new BMenu("Option", B_ITEMS_IN_COLUMN);
+	menu->AddItem(new BMenuItem("Data firm", new BMessage(MENU_CONFFIRMA)));
+	menu->AddItem(new BMenuItem("VAT rates", new BMessage(MENU_CONFVAT)));
+	menu->AddItem(new BMenuItem("Date of payment", new BMessage(MENU_PAYDAY)));
 	menu->AddSeparatorItem();
-	BMenu *printmenu = new BMenu("Rodzaj wydruku", B_ITEMS_IN_COLUMN);
+	BMenu *printmenu = new BMenu("Print type", B_ITEMS_IN_COLUMN);
 	menu->AddItem(printmenu);
-	menu->AddItem(new BMenuItem("Liczba kopii", new BMessage(MENU_NUMCOPY)));
+	menu->AddItem(new BMenuItem("Number of copies", new BMessage(MENU_NUMCOPY)));
 	menu->AddSeparatorItem();
-	menu->AddItem(fmenunum = new BMenuItem("Numeracja uproszczona", new BMessage(MENU_FNUMSIMP)));
+	menu->AddItem(fmenunum = new BMenuItem("Simplified numbering", new BMessage(MENU_FNUMSIMP)));
 	menuBar->AddItem(menu);
 
-	menu = new BMenu("Podsumowania", B_ITEMS_IN_COLUMN);
-	menu->AddItem(new BMenuItem("Miesięczna sprzedaż", new BMessage(MENU_STATMIES)));
-	menu->AddItem(new BMenuItem("Należności", new BMessage(MENU_STATNALEZ)));
+	menu = new BMenu("Summaries", B_ITEMS_IN_COLUMN);
+	menu->AddItem(new BMenuItem("Monthly sales", new BMessage(MENU_STATMIES)));
+	menu->AddItem(new BMenuItem("Receivables", new BMessage(MENU_STATNALEZ)));
 	menuBar->AddItem(menu);
 
-	printmenu->AddItem(pmenups   = new BMenuItem("Drukarka", new BMessage(MENU_PRINTPS)));
-	printmenu->AddItem(pmenut80  = new BMenuItem("Tekst (80 kol.)", new BMessage(MENU_PRINTT80)));
-	printmenu->AddItem(pmenut136 = new BMenuItem("Tekst (136 kol.)", new BMessage(MENU_PRINTT136)));
+	printmenu->AddItem(pmenups   = new BMenuItem("Printer", new BMessage(MENU_PRINTPS)));
+	printmenu->AddItem(pmenut80  = new BMenuItem("Text (80 kol.)", new BMessage(MENU_PRINTT80)));
+	printmenu->AddItem(pmenut136 = new BMenuItem("Text (136 kol.)", new BMessage(MENU_PRINTT136)));
 	printmenu->AddItem(pmenuhtml = new BMenuItem("HTML", new BMessage(MENU_PRINTHTML)));
 
 	// tabview
@@ -154,26 +154,26 @@ void BeFAKMainWindow::DoConfigVAT(void) {
 
 void BeFAKMainWindow::DoConfigCopies(void) {
 	BString def;
-	def = tabs[FAKTURATAB]->execSQL("SELECT p_lkopii FROM konfiguracja WHERE zrobiona = 1");
-	numDialog = new dialNumber("Liczba drukowanych kopii", "Liczba kopii", def.String(), MSG_NUMCOPY, this);
+	def = tabs[FAKTURATAB]->execSQL("SELECT i_numcopy FROM configuration WHERE done = 1");
+	numDialog = new dialNumber("Number of copies printed", "Number of copies", def.String(), MSG_NUMCOPY, this);
 }
 
 void BeFAKMainWindow::DoConfigCopiesAfter(BMessage *msg) {
 	const char *tmp;
 	BString sql;
-	int p_lkopii = 0;
+	int i_numcopy = 0;
 	if (msg->FindString("_value", &tmp) == B_OK) {
 		sql = "SELECT ABS('0"; sql += tmp; sql += "')";
-		p_lkopii = toint(tabs[FAKTURATAB]->execSQL(sql.String()));
-		sqlite_exec_printf(dbData, "UPDATE konfiguracja SET p_lkopii = %i WHERE zrobiona = 1", 0, 0, &dbErrMsg,
-			p_lkopii);
+		i_numcopy = toint(tabs[FAKTURATAB]->execSQL(sql.String()));
+		sqlite_exec_printf(dbData, "UPDATE configuration SET i_numcopy = %i WHERE done = 1", 0, 0, &dbErrMsg,
+			i_numcopy);
 	}
 }
 
 void BeFAKMainWindow::DoConfigPayday(void) {
 	BString def;
-	def = tabs[FAKTURATAB]->execSQL("SELECT paydays FROM konfiguracja WHERE zrobiona = 1");
-	numDialog = new dialNumber("Domyślny termin płatności", "Liczba dni", def.String(), MSG_PAYDAY, this);
+	def = tabs[FAKTURATAB]->execSQL("SELECT paydays FROM configuration WHERE done = 1");
+	numDialog = new dialNumber("Default payment date", "Number of days", def.String(), MSG_PAYDAY, this);
 }
 
 void BeFAKMainWindow::DoConfigPaydayAfter(BMessage *msg) {
@@ -183,7 +183,7 @@ void BeFAKMainWindow::DoConfigPaydayAfter(BMessage *msg) {
 	if (msg->FindString("_value", &tmp) == B_OK) {
 		sql = "SELECT ABS('0"; sql += tmp; sql += "')";
 		paydays = toint(tabs[FAKTURATAB]->execSQL(sql.String()));
-		sqlite_exec_printf(dbData, "UPDATE konfiguracja SET paydays = %i WHERE zrobiona = 1", 0, 0, &dbErrMsg,
+		sqlite_exec_printf(dbData, "UPDATE configuration SET paydays = %i WHERE done = 1", 0, 0, &dbErrMsg,
 			paydays);
 	}
 }
@@ -201,7 +201,7 @@ void BeFAKMainWindow::DoCheckConfig(void) {
 	char **result;
 	BString sql;
 	// select NAZWA and all config data
-	sql = "SELECT name, version, p_mode, p_typ, p_textcols, p_texteol, f_numprosta FROM konfiguracja WHERE zrobiona = 1";
+	sql = "SELECT name, version, p_mode, p_typ, p_textcols, p_texteol, f_numprosta FROM configuration WHERE done = 1";
 //printf("sql:%s\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i\n", nRows, nCols);
@@ -241,9 +241,9 @@ void BeFAKMainWindow::updateMenus(void) {
 	pmenut136->SetMarked( (p_mode==1) && (p_textcols==136) );
 	pmenuhtml->SetMarked(p_mode == 2);
 	fmenunum->SetMarked(f_numprosta);
-	BString sql = "UPDATE konfiguracja SET p_mode = %i, p_typ = %i, p_textcols = %i, "
+	BString sql = "UPDATE configuration SET p_mode = %i, p_typ = %i, p_textcols = %i, "
 		"p_texteol = %i, f_numprosta = %i "
-		"WHERE zrobiona = 1";
+		"WHERE done = 1";
 	sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
 		p_mode, p_typ, p_textcols, p_texteol, f_numprosta);
 //printf("result:%s\n",dbErrMsg);

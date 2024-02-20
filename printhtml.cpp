@@ -26,7 +26,7 @@ void printHTML::Go(void) {
 
 	// otworz plik z szablonem
 	szablon = new BFile();
-	tpl = flist->execSQL("SELECT p_htmltemplate FROM konfiguracja WHERE zrobiona = 1");
+	tpl = flist->execSQL("SELECT p_htmltemplate FROM configuration WHERE done = 1");
 	r = szablon->SetTo(tpl.String(), B_READ_ONLY);
 	if (r != B_OK) {
 		tmp = "Nie znaleziono pliku szablonu:\n"; tmp += tpl;
@@ -41,7 +41,7 @@ void printHTML::Go(void) {
 		if (tpl.Length() == 0)
 			return;
 		// zapisać nową ścieżkę do szablonu
-		sqlite_exec_printf(dbData, "UPDATE konfiguracja SET p_htmltemplate = %Q WHERE zrobiona = 1", 0, 0, &dbErrMsg,
+		sqlite_exec_printf(dbData, "UPDATE configuration SET p_htmltemplate = %Q WHERE done = 1", 0, 0, &dbErrMsg,
 			tpl.String());
 		szablon->SetTo(tpl.String(), B_READ_ONLY);
 	}

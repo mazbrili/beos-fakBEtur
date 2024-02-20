@@ -538,7 +538,7 @@ void tabFaktura::makeNewForm(void) {
 	curdata->ogol[2] = tmp;
 	curdata->ogol[3] = tmp;
 	// data płatności = dziś+paydays
-	curdata->ogol[7] = execSQL("SELECT paydays FROM konfiguracja WHERE zrobiona = 1");
+	curdata->ogol[7] = execSQL("SELECT paydays FROM configuration WHERE done = 1");
 	ogol[3]->SetText(curdata->ogol[3].String());
 	ogol[7]->SetText(curdata->ogol[7].String());
 	updateTermin();
@@ -546,11 +546,11 @@ void tabFaktura::makeNewForm(void) {
 	// 
 	uwagi->SetText("");
 	// miejsce wystawienia - weź z danych firmy
-	curdata->ogol[0] = execSQL("SELECT miejscowosc FROM konfiguracja WHERE zrobiona = 1");
+	curdata->ogol[0] = execSQL("SELECT miejscowosc FROM configuration WHERE done = 1");
 	// wystawiający - z konfiguracji
-	curdata->ogol[1] = execSQL("SELECT f_wystawil FROM konfiguracja WHERE zrobiona = 1");
+	curdata->ogol[1] = execSQL("SELECT f_wystawil FROM configuration WHERE done = 1");
 	// wygenerowanie nowej nazwy
-	bool prosta = toint(execSQL("SELECT f_numprosta FROM konfiguracja WHERE zrobiona = 1"));
+	bool prosta = toint(execSQL("SELECT f_numprosta FROM configuration WHERE done = 1"));
 	// identyfikator z daty
 	rok = tmp;
 	rok.Remove(4,rok.Length()-4);
@@ -1405,20 +1405,20 @@ void tabFaktura::RefreshVatSymbols(void) {
 }
 
 void tabFaktura::printCurrent(void) {
-	int p_typ = toint(execSQL("SELECT p_typ FROM konfiguracja WHERE zrobiona = 1"));
+	int p_typ = toint(execSQL("SELECT p_typ FROM configuration WHERE done = 1"));
 	int oldp_typ = p_typ;
 	if (p_typ == 3) {
 		// set typ orig, print
-		execSQL("UPDATE konfiguracja SET p_typ = 0");
+		execSQL("UPDATE configuration SET p_typ = 0");
 		printAPage();
 		// set typ to copy, fall through
-		execSQL("UPDATE konfiguracja SET p_typ = 1");
+		execSQL("UPDATE configuration SET p_typ = 1");
 		p_typ = 1;
 	}
 	// print copies?
 	if (p_typ == 1) {
-		int p_lkopii = toint(execSQL("SELECT p_lkopii FROM konfiguracja WHERE zrobiona = 1"));
-		for (int i=1;i<=p_lkopii;i++)
+		int i_numcopy = toint(execSQL("SELECT i_numcopy FROM configuration WHERE done = 1"));
+		for (int i=1;i<=i_numcopy;i++)
 			printAPage(i);
 	} else {
 		// print dupe or orig
@@ -1426,7 +1426,7 @@ void tabFaktura::printCurrent(void) {
 	}
 	// restore original if needed
 	if (p_typ != oldp_typ) {
-		sqlite_exec_printf(dbData, "UPDATE konfiguracja SET p_typ = %i", 0, 0, &dbErrMsg,
+		sqlite_exec_printf(dbData, "UPDATE configuration SET p_typ = %i", 0, 0, &dbErrMsg,
 		oldp_typ);
 	}
 }
@@ -1435,7 +1435,7 @@ void tabFaktura::printAPage(int numkopii=0) {
 	if (curdata->id<0)
 		return;
 	beFakPrint *print;
-	int p_mode = toint(execSQL("SELECT p_mode FROM konfiguracja WHERE zrobiona = 1"));
+	int p_mode = toint(execSQL("SELECT p_mode FROM configuration WHERE done = 1"));
 	switch(p_mode) {
 		case 2:
 			print = new printHTML(curdata->id, this->dbData, numkopii);

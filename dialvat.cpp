@@ -21,7 +21,7 @@ const uint32 LIST_SEL	= 'DVLS';
 
 dialVat::dialVat(sqlite *db, BHandler *hr) : BWindow(
 	BRect(120, 120, 120+380, 120+250),
-	"Stawki VAT",
+	"VAT rates",
 	B_TITLED_WINDOW,
 	B_NOT_RESIZABLE ), beFakTab(NULL, db, hr) {
 

@@ -32,7 +32,7 @@ beFakPrint::beFakPrint(int id, sqlite *db, int numkopii) {
 	sql += ", p_texteol, p_htmltemplate";
 	sql += ", name, address, code, miejscowosc, telefon, email";
 	sql += ", nip, regon, bank, konto";
-	sql += " FROM konfiguracja WHERE zrobiona = 1";
+	sql += " FROM configuration WHERE done = 1";
 //printf("sql:%s\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i\n", nRows, nCols);
@@ -54,7 +54,7 @@ beFakPrint::beFakPrint(int id, sqlite *db, int numkopii) {
 
 	switch (p_typ) {
 		case 2:
-			typfaktury = "Duplikat";
+			typfaktury = "Duplicate";
 			break;
 		case 1:
 			typfaktury = "Copy";
@@ -256,7 +256,7 @@ const char *beFakPrint::makeName(void) {
 void beFakPrint::saveToFile(const char *name, const BString *content) {
 	BPath path;
 	BString tmp;
-	tmp = flist->execSQL("SELECT p_writepath FROM konfiguracja WHERE zrobiona = 1");
+	tmp = flist->execSQL("SELECT p_writepath FROM configuration WHERE done = 1");
 	BEntry *ent = dialFile::SaveDialog("Zapisz wydruk do pliku", tmp.String(), name);
 
 	ent->GetPath(&path);
@@ -269,7 +269,7 @@ void beFakPrint::saveToFile(const char *name, const BString *content) {
 		savefile->Unset();
 		// put path as default writing path
 		tmp.RemoveLast(path.Leaf());
-		sqlite_exec_printf(dbData, "UPDATE konfiguracja SET p_writepath = %Q WHERE zrobiona = 1", 0, 0, &dbErrMsg,
+		sqlite_exec_printf(dbData, "UPDATE configuration SET p_writepath = %Q WHERE done = 1", 0, 0, &dbErrMsg,
 			tmp.String());
 	}
 }
