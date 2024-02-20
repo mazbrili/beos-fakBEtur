@@ -109,14 +109,14 @@ void dialVat::MessageReceived(BMessage *Message) {
 			break;
 		case BUT_SAVE:
 			if (id>=0) {
-				sql = "UPDATE stawka_vat SET name = %Q WHERE aktywne = 1 AND id = "; sql << id;
+				sql = "UPDATE vat_rate SET name = %Q WHERE aktywne = 1 AND id = "; sql << id;
 				ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg, name->Text());
 			} else {
 				// dopisujemy nowy, ostrzec ze nieodwracalnie???
 				if (strlen(name->Text())>0) {
 					stawka->SetText(validateDecimal(stawka->Text()));
 					ret = sqlite_exec_printf(dbData,
-					"INSERT INTO stawka_vat (name,stawka,aktywne) VALUES ( %Q, %Q, 1 )",
+					"INSERT INTO vat_rate (name,stawka,aktywne) VALUES ( %Q, %Q, 1 )",
 					0, 0, &dbErrMsg, name->Text(), stawka->Text());
 				}
 			}
@@ -124,7 +124,7 @@ void dialVat::MessageReceived(BMessage *Message) {
 			break;
 		case BUT_DEL:
 			if (id>=0) {
-				sql = "UPDATE stawka_vat SET aktywne = 0 WHERE id = "; sql << id;
+				sql = "UPDATE vat_rate SET aktywne = 0 WHERE id = "; sql << id;
 				ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg);
 			}
 			makeNewStawka();
@@ -154,7 +154,7 @@ void dialVat::ChangedSelection(int newid) {
 	if (id >=0) {
 		int nRows, nCols;
 		char **result;
-		BString sql = "SELECT name, stawka FROM stawka_vat WHERE id = "; sql << id;
+		BString sql = "SELECT name, stawka FROM vat_rate WHERE id = "; sql << id;
 		sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 		if (nRows < 1) {
 			// no entries
@@ -180,7 +180,7 @@ void dialVat::RefreshIndexList(void) {
 	// select list from db
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT id, name, stawka FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT id, name, stawka FROM vat_rate WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {

@@ -103,7 +103,7 @@ dialNalodb::dialNalodb(sqlite *db, const char *odb) : BWindow(
 		for (int i=1;i<=nRows;i++) {
 			// brutto 'do zaplaty'
 			sql = "SELECT DECROUND(SUM(DECROUND(DECROUND(DECROUND(p.netto*(100-p.rabat)/100.0)*p.ilosc)*(100+s.stawka)/100.0))) AS sumabrutto ";
-			sql += "FROM faktura AS f, pozycjafakt AS p, stawka_vat AS s ";
+			sql += "FROM faktura AS f, pozycjafakt AS p, vat_rate AS s ";
 			sql += "WHERE p.fakturaid = f.id AND p.vatid = s.id AND f.id = ";
 			sql << result[i*nCols+0];
 			sqlite_get_table(dbData, sql.String(), &result2, &nRows2, &nCols2, &dbErrMsg);

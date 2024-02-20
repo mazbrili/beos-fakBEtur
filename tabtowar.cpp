@@ -246,7 +246,7 @@ void tabTowar::updateTab(void) {
 	BString sql;
 // brać tu pod uwagę rabat/marżę - NIE: robi to but_sell
 	sql = "SELECT DECROUND(0"; sql += ceny[0]->Text();
-	sql += "*(100+stawka)/100.0) FROM stawka_vat WHERE id = ";
+	sql += "*(100+stawka)/100.0) FROM vat_rate WHERE id = ";
 	sql << curdata->vatid;
 	brutto->SetText(execSQL(sql.String()));
 }
@@ -526,7 +526,7 @@ void tabTowar::RefreshVatSymbols(void) {
 	char **result;
 	BMessage *msg;
 
-	sqlite_get_table(dbData, "SELECT id, name FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT id, name FROM vat_rate WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// XXX Panic! empty vat table
 	} else {

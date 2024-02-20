@@ -579,7 +579,7 @@ void pozfaklist::fetch(int fakturaid) {
 		}
 		calcBruttoFin(result);
 		// vat = stawka
-		sql = "SELECT name FROM stawka_vat WHERE id = "; sql << data->vatid;
+		sql = "SELECT name FROM vat_rate WHERE id = "; sql << data->vatid;
 		data->data[8] = execSQL(sql.String());
 		j++;							// next row
 	}
@@ -617,7 +617,7 @@ char **pozfaklist::calcBrutto(const char *cnetto, const char *rabat, const char 
 	sql += ", DECROUND(DECROUND(DECROUND(cnetto*ilosc)*(100+s.stawka)/100.0)-DECROUND(cnetto*ilosc)) AS wvat";
 	// [5] - wbrutto = cnetto*ilosc*(1+stawka)
 	sql += ",          DECROUND(DECROUND(cnetto*ilosc)*(100+s.stawka)/100.0) AS wbrutto";
-	sql += " FROM calcs, stawka_vat AS s WHERE s.id = vatid";
+	sql += " FROM calcs, vat_rate AS s WHERE s.id = vatid";
 //printf("sql:[%s]\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);

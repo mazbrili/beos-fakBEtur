@@ -97,7 +97,7 @@ void beFakPrint::makeSummary(void) {
 	BString sql;
 
 	// suma z rozbiciem na stawki
-	sql = "SELECT DECROUND(SUM(s.wnetto)), v.name, DECROUND(SUM(s.wvat)), DECROUND(SUM(s.wbrutto)) FROM sumawydruk AS s, stawka_vat AS v WHERE v.id = s.vatid GROUP BY s.vatid ORDER BY v.stawka";
+	sql = "SELECT DECROUND(SUM(s.wnetto)), v.name, DECROUND(SUM(s.wvat)), DECROUND(SUM(s.wbrutto)) FROM sumawydruk AS s, vat_rate AS v WHERE v.id = s.vatid GROUP BY s.vatid ORDER BY v.stawka";
 //printf("sql:[%s]\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
@@ -118,7 +118,7 @@ void beFakPrint::makeSummary(void) {
 	}
 	sqlite_free_table(result);
 	// obliczyc RAZEM
-	sql = "SELECT DECROUND(SUM(s.wnetto)), '', DECROUND(SUM(s.wvat)), DECROUND(SUM(s.wbrutto)) FROM sumawydruk AS s, stawka_vat AS v WHERE v.id = s.vatid";
+	sql = "SELECT DECROUND(SUM(s.wnetto)), '', DECROUND(SUM(s.wvat)), DECROUND(SUM(s.wbrutto)) FROM sumawydruk AS s, vat_rate AS v WHERE v.id = s.vatid";
 //printf("sql:[%s]\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);

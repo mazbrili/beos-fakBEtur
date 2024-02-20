@@ -1278,7 +1278,7 @@ bool tabFaktura::DoCommitTowardata(void) {
 	newdata->data[9] = suma[4]->Text();		// kwota vat
 	newdata->data[10] = suma[5]->Text();	// w.brutto
 	newdata->data[11] = towar[2]->Text();	// c.netto
-	sql = "SELECT name FROM stawka_vat WHERE id = "; sql << curtowarvatid;
+	sql = "SELECT name FROM vat_rate WHERE id = "; sql << curtowarvatid;
 	newdata->data[8] = execSQL(sql.String());
 	// dodaj do listy
 	if (towarmark < 0)
@@ -1386,7 +1386,7 @@ void tabFaktura::RefreshVatSymbols(void) {
 	char **result;
 	BMessage *msg;
 
-	sqlite_get_table(dbData, "SELECT id, name FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT id, name FROM vat_rate WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// XXX Panic! empty vat table
 	} else {

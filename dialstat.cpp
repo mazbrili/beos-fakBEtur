@@ -130,7 +130,7 @@ void dialStat::DoFind(void) {
 	// podsumowanie - suma netto, suma vat
 	sql = "SELECT DECROUND(SUM(DECROUND(DECROUND(p.netto*(100-p.rabat)/100.0)*p.ilosc))) AS sumanetto, ";
 	sql += "DECROUND(SUM(DECROUND(DECROUND(DECROUND(p.netto*(100-p.rabat)/100.0)*p.ilosc)*s.stawka/100.0))) AS sumavat ";
-	sql += "FROM faktura AS f, pozycjafakt AS p, stawka_vat AS s ";
+	sql += "FROM faktura AS f, pozycjafakt AS p, vat_rate AS s ";
 	sql += "WHERE p.fakturaid = f.id AND p.vatid = s.id AND f.data_sprzedazy BETWEEN '";
 	sql += omies; sql += "' AND DATE('"; sql += omies; sql +="', '+1 month', 'start of month', '-1 day') ";
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
