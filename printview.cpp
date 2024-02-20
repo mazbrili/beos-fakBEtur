@@ -26,7 +26,7 @@ const char *tabhline3[] = { "88",  "MMMMMMMMMMMMMMMMMM", "MM.MM.MM.MM", "88888.8
 printView::printView(int id, sqlite *db, int numkopii, BMessage *pSettings) : beFakPrint(id,db,numkopii),
 	 BView(BRect(0,0,100,100), "printView", B_FOLLOW_ALL, B_WILL_DRAW) {
 	status_t result = B_OK;
-	printJob = new BPrintJob(fdata->nazwa.String());
+	printJob = new BPrintJob(fdata->name.String());
 	printJob->SetSettings(new BMessage(*pSettings));
 // dla przyspieszenia preview, potem wlaczyc!!!
 //XXX	result = printJob->ConfigJob();
@@ -131,7 +131,7 @@ void printView::Draw(BRect pageRect) {
 	fontb.SetSize(18.0);
 	SetFont(&fontb);
 	cur = PenLocation();
-	tmp = "Faktura VAT nr "; tmp += fdata->nazwa;
+	tmp = "Faktura VAT nr "; tmp += fdata->name;
 	cur.x = pageRect.left+(pageRect.Width()-fontb.StringWidth(tmp.String()))/2;
 	cur.y += fontb.Size()+fontb.Size()+10;
 	MovePenTo(cur);

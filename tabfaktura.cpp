@@ -73,7 +73,7 @@ class pozCListItem : public CLVEasyItem {
 			BString tmp = "";
 			tmp << col0;
 			SetColumnContent(0,tmp.String(), true, true);	// lp
-			SetColumnContent(1,col1);				// nazwa
+			SetColumnContent(1,col1);				// name
 			SetColumnContent(2,col2);				// pkwiu
 			SetColumnContent(3,col3, true, true);	// ilosc
 			SetColumnContent(4,col4, true, true);	// jm
@@ -165,8 +165,8 @@ tabFaktura::~tabFaktura() {
 
 void tabFaktura::initTab1(void) {
 //	views: 0,0,490,600
-	nazwa = new BTextControl(BRect(10,10,300,30), "tfna", "Invoice No", NULL, new BMessage(DC));
-	viewogol->AddChild(nazwa);
+	name = new BTextControl(BRect(10,10,300,30), "tfna", "Invoice No", NULL, new BMessage(DC));
+	viewogol->AddChild(name);
 	// box1
 	box1 = new BBox(BRect(10,40,300,210),"tf1box1");
 	box1->SetLabel("");
@@ -273,7 +273,7 @@ void tabFaktura::initTab1(void) {
 	menusymbolField->SetDivider(be_plain_font->StringWidth(menusymbolField->Label())+15);
 	box4->AddChild(menusymbolField);
 	// fix widths
-	nazwa->SetDivider(be_plain_font->StringWidth(nazwa->Label())+5);
+	name->SetDivider(be_plain_font->StringWidth(name->Label())+5);
 	int i;
 	for (i=0;i<=9;i++)
 		ogol[i]->SetDivider(be_plain_font->StringWidth(ogol[i]->Label())+5);
@@ -429,7 +429,7 @@ void tabFaktura::initTab2(void) {
 
 void tabFaktura::curdataFromTab(void) {
 	int i;
-	curdata->nazwa = nazwa->Text();
+	curdata->name = name->Text();
 	for (i=0;i<=9;i++)
 		curdata->ogol[i]=ogol[i]->Text();
 	for (i=0;i<=10;i++)
@@ -440,7 +440,7 @@ void tabFaktura::curdataFromTab(void) {
 
 void tabFaktura::curdataToTab(void) {
 	int i;
-	nazwa->SetText(curdata->nazwa.String());
+	name->SetText(curdata->name.String());
 	for (i=0;i<=9;i++)
 		ogol[i]->SetText(curdata->ogol[i].String());
 	for (i=0;i<=10;i++)
@@ -452,7 +452,7 @@ void tabFaktura::curdataToTab(void) {
 
 void tabFaktura::updateTab(void) {
 	BMessage *msg = new BMessage(MSG_NAMECHANGE);
-	msg->AddString("_newtitle", nazwa->Text());
+	msg->AddString("_newtitle", name->Text());
 	handler->Looper()->PostMessage(msg);
 
 	ogol[2]->SetText(validateDate(ogol[2]->Text()));
@@ -488,11 +488,11 @@ void tabFaktura::updateTab2(void) {
 	}
 	faklista->calcBruttoFin(result);
 	// retr magazyn state
-	BString sql, nazwa;
-	nazwa = towar[0]->Text(); nazwa.ReplaceAll("'","''"); nazwa.Prepend("'"); nazwa.Append("'");
-	sql = "SELECT usluga FROM towar WHERE nazwa = "; sql += nazwa;
+	BString sql, name;
+	name = towar[0]->Text(); name.ReplaceAll("'","''"); name.Prepend("'"); name.Append("'");
+	sql = "SELECT usluga FROM towar WHERE name = "; sql += name;
 	if (!toint(execSQL(sql.String()))) {
-		sql = "SELECT magazyn FROM towar WHERE nazwa = "; sql += nazwa;
+		sql = "SELECT magazyn FROM towar WHERE name = "; sql += name;
 		sql = execSQL(sql.String());
 		sql += " ";
 		sql += towar[5]->Text();
@@ -564,7 +564,7 @@ void tabFaktura::makeNewForm(void) {
 	// max from configuration? it works fine anyway
 	curmax = 0;
 	// names of all invoices with the current year and month
-	tmp = "SELECT nazwa FROM faktura WHERE data_wystawienia > '";
+	tmp = "SELECT name FROM faktura WHERE data_wystawienia > '";
 	tmp += rok; tmp += "-"; tmp += mies; tmp += "-01' ORDER BY data_wystawienia";
 	sqlite_get_table(dbData, tmp.String(), &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
@@ -587,7 +587,7 @@ void tabFaktura::makeNewForm(void) {
 	}
 	tmp << rok;
 	// wygeneruj string, zapisz
-	curdata->nazwa = tmp;
+	curdata->name = tmp;
 	curdataToTab();
 	RefreshTowarList();
 }
@@ -618,21 +618,21 @@ bool tabFaktura::validateTab(void) {
 	BString sql, tmp;
 	int i;
 
-	// numer/nazwa - niepuste
-	if (strlen(nazwa->Text()) == 0) {
+	// numer/name - niepuste
+	if (strlen(name->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Invoice number not entered!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
-		nazwa->MakeFocus();
+		name->MakeFocus();
 		return false;
 	}
-	// numer/nazwa - unikalne
-	tmp = nazwa->Text(); tmp.ReplaceAll("'","''");	// sql quote
-	sql = "SELECT id FROM faktura WHERE nazwa = '"; sql += tmp; sql += "'";
+	// numer/name - unikalne
+	tmp = name->Text(); tmp.ReplaceAll("'","''");	// sql quote
+	sql = "SELECT id FROM faktura WHERE name = '"; sql += tmp; sql += "'";
 	i = toint(execSQL(sql.String()));
 	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != 0) && (i != curdata->id))) {
 		error = new BAlert(APP_NAME, "The invoice number is not unique!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
-		nazwa->MakeFocus();
+		name->MakeFocus();
 		return false;
 	}
 	// miejsce - niepuste
@@ -718,16 +718,16 @@ bool tabFaktura::validateTab(void) {
 			return false;
 		}
 	}
-	// nazwa - niepusta
+	// name - niepusta
 	if (strlen(data[0]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "The contractor's name has not been entered!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		data[0]->MakeFocus();
 		return false;
 	}
-	// nazwa - unikalna
+	// name - unikalna
 	tmp = data[0]->Text(); tmp.ReplaceAll("'","''");	// sql quote
-	sql = "SELECT id FROM firma WHERE nazwa = '"; sql += tmp; sql += "'";
+	sql = "SELECT id FROM firma WHERE name = '"; sql += tmp; sql += "'";
 	i = toint(execSQL(sql.String()));
 	if (i == 0) {
 		firmadat *newfirma = new firmadat(dbData);
@@ -738,7 +738,7 @@ bool tabFaktura::validateTab(void) {
 		dialSymbol *tow = new dialSymbol(dbData, false, (dbdat*)newfirma, handler);
 		tow->Show();
 	} else {
-		// taka nazwa jest w bazie...
+		// taka name jest w bazie...
 		// porównać dane z tym z id
 		firmadat *oldfirma = new firmadat(dbData);
 		int j = 0;
@@ -782,7 +782,7 @@ bool tabFaktura::validateTowar(void) {
 	BAlert *error;
 	BString sql, tmp;
 	int i;
-	// nazwa niepusta?
+	// name niepusta?
 	if (strlen(towar[0]->Text()) == 0) {
 		// pusta, ale jesli nie brudne dane, to znaczy ze nowy towar!
 		if (!towardirty)
@@ -792,7 +792,7 @@ bool tabFaktura::validateTowar(void) {
 		towar[0]->MakeFocus();
 		return false;
 	}
-	// nazwa - unikalna na fakturze
+	// name - unikalna na fakturze
 	pozfakitem *cur = faklista->start;
 	i = 0;
 	while (cur!=NULL) {
@@ -847,14 +847,14 @@ bool tabFaktura::validateTowar(void) {
 		error->Go();
 		return false;
 	}
-	// nazwa - nowa w bazie?
+	// name - nowa w bazie?
 	tmp = towar[0]->Text(); tmp.ReplaceAll("'","''");	// sql quote
-	sql = "SELECT id FROM towar WHERE nazwa = '"; sql += tmp; sql += "'";
+	sql = "SELECT id FROM towar WHERE name = '"; sql += tmp; sql += "'";
 	i = toint(execSQL(sql.String()));
 	if (i == 0) {
 		towardat *newtowar = new towardat(dbData);
 		newtowar->id = -1;
-		newtowar->data[0] = towar[0]->Text();	// nazwa
+		newtowar->data[0] = towar[0]->Text();	// name
 		newtowar->data[2] = towar[1]->Text();	// pkwiu
 		newtowar->data[3] = towar[5]->Text();	// jm
 		newtowar->ceny[0] = towar[2]->Text();	// cena netto
@@ -862,7 +862,7 @@ bool tabFaktura::validateTowar(void) {
 		dialSymbol *sym = new dialSymbol(dbData, true, (dbdat*)newtowar, handler);
 		sym->Show();
 	} else {
-		// taka nazwa jest w bazie...
+		// taka name jest w bazie...
 		// porównać dane z tym z id
 		towardat *oldtowar = new towardat(dbData);
 		int j = 0;
@@ -905,7 +905,7 @@ bool tabFaktura::validateTowar(void) {
 					// magazyn+starafaktura < nowa?
 					sql = "SELECT (0"; sql += oldtowar->magazyn; sql += "+ilosc < 0"; sql += towar[4]->Text();
 					sql += ") FROM pozycjafakt WHERE fakturaid = "; sql << curdata->id;
-					sql += " AND nazwa = '"; sql += oldtowar->data[0]; sql += "'";
+					sql += " AND name = '"; sql += oldtowar->data[0]; sql += "'";
 				} else {
 					// magazyn < nowa?
 					sql = "SELECT 0"; sql += oldtowar->magazyn; sql += "< 0"; sql += towar[4]->Text();
@@ -1125,7 +1125,7 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			this->dirty = true;
 			break;
 		case MENU_PAGESETUP:
-			PageSetup(nazwa->Text());
+			PageSetup(name->Text());
 			break;
 	}
 }
@@ -1159,7 +1159,7 @@ void tabFaktura::ChangedTowarSelection(int newid) {
 	pozfakdata *item = faklista->itemat(newid);
 	if (item != NULL) {
 		// fetch data into widgets
-		towar[0]->SetText(item->data[1].String());	// nazwa
+		towar[0]->SetText(item->data[1].String());	// name
 		towar[1]->SetText(item->data[2].String());	// pkwiu
 		towar[4]->SetText(item->data[3].String());	// ilosc
 		towar[5]->SetText(item->data[4].String());	// jm
@@ -1222,7 +1222,7 @@ void tabFaktura::RefreshIndexList(void) {
 	// select list from db
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT id, nazwa, data_sprzedazy FROM faktura ORDER BY data_sprzedazy, nazwa", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT id, name, data_sprzedazy FROM faktura ORDER BY data_sprzedazy, name", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {
@@ -1267,7 +1267,7 @@ bool tabFaktura::DoCommitTowardata(void) {
 	}
 	// zapisz pola danych
 	newdata->data[0] = "0";					// lp
-	newdata->data[1] = towar[0]->Text();	// nazwa
+	newdata->data[1] = towar[0]->Text();	// name
 	newdata->data[2] = towar[1]->Text();	// pkwiu
 	newdata->data[3] = towar[4]->Text();	// ilosc
 	newdata->data[4] = towar[5]->Text();	// jm
@@ -1278,7 +1278,7 @@ bool tabFaktura::DoCommitTowardata(void) {
 	newdata->data[9] = suma[4]->Text();		// kwota vat
 	newdata->data[10] = suma[5]->Text();	// w.brutto
 	newdata->data[11] = towar[2]->Text();	// c.netto
-	sql = "SELECT nazwa FROM stawka_vat WHERE id = "; sql << curtowarvatid;
+	sql = "SELECT name FROM stawka_vat WHERE id = "; sql << curtowarvatid;
 	newdata->data[8] = execSQL(sql.String());
 	// dodaj do listy
 	if (towarmark < 0)
@@ -1386,7 +1386,7 @@ void tabFaktura::RefreshVatSymbols(void) {
 	char **result;
 	BMessage *msg;
 
-	sqlite_get_table(dbData, "SELECT id, nazwa FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT id, name FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// XXX Panic! empty vat table
 	} else {
@@ -1446,7 +1446,7 @@ void tabFaktura::printAPage(int numkopii=0) {
 		case 0:
 		default:
 			{	if (printSettings == NULL)
-					if (PageSetup(nazwa->Text()) != B_OK)
+					if (PageSetup(name->Text()) != B_OK)
 						return;
 				print = new printView(curdata->id, this->dbData, numkopii, printSettings);
 				break;

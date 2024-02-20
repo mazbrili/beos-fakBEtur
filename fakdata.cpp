@@ -42,14 +42,14 @@ void firmadat::commit(void) {
 //printf("commit\n");
 	if (id>=0) {	// UPDATE
 		sql = "UPDATE firma SET ";
-		sql += "nazwa = %Q, symbol = %Q, adres = %Q, kod = %Q, miejscowosc = %Q, telefon = %Q, email = %Q";
+		sql += "name = %Q, symbol = %Q, adres = %Q, kod = %Q, miejscowosc = %Q, telefon = %Q, email = %Q";
 		sql += ", nip = %Q, regon = %Q, bank = %Q, konto = %Q";
 		sql += ", odbiorca = %i, dostawca = %i, aktywny = %i, zablokowany = %i";
 		sql += " WHERE id = %i";
 	} else {		// INSERT
 		id = generate_id();
 		sql += "INSERT INTO firma ( ";
-		sql += "nazwa, symbol, adres, kod, miejscowosc, telefon, email";
+		sql += "name, symbol, adres, kod, miejscowosc, telefon, email";
 		sql += ", nip, regon, bank, konto";
 		sql += ", odbiorca, dostawca, aktywny, zablokowany";
 		sql += ", id ) VALUES ( ";
@@ -75,7 +75,7 @@ void firmadat::fetch(void) {
 	char **result;
 	BString sql;	
 	sql = "SELECT ";
-	sql += "nazwa, symbol, adres, kod, miejscowosc, telefon, email";
+	sql += "name, symbol, adres, kod, miejscowosc, telefon, email";
 	sql += ", nip, regon, bank, konto";
 	sql += ", odbiorca, dostawca, aktywny, zablokowany";
 	sql += " FROM firma WHERE id = ";
@@ -138,7 +138,7 @@ void towardat::commit(void) {
 //printf("commit\n");
 	if (id>=0) {	// UPDATE
 		sql = "UPDATE towar SET ";
-		sql += "nazwa = %Q, symbol = %Q, pkwiu = %Q, jm = %Q";
+		sql += "name = %Q, symbol = %Q, pkwiu = %Q, jm = %Q";
 		sql += ", usluga = %i, dodany = date('now'), notatki = %Q, vatid = %i";
 		sql += ", netto = %Q, zakupu = %Q, marza = %Q, rabat = %Q, kurs = %Q, clo = %Q";
 		sql += ", magazyn = %Q, magzmiana = date('now')";
@@ -146,7 +146,7 @@ void towardat::commit(void) {
 	} else {		// INSERT
 		id = generate_id();
 		sql += "INSERT INTO towar ( ";
-		sql += "nazwa, symbol, pkwiu, jm";
+		sql += "name, symbol, pkwiu, jm";
 		sql += ", usluga, dodany, notatki, vatid";
 		sql += ", netto, zakupu, marza, rabat";
 		sql += ", kurs, clo";
@@ -177,7 +177,7 @@ void towardat::fetch(void) {
 	char **result;
 	BString sql;	
 	sql = "SELECT ";
-	sql += "nazwa, symbol, pkwiu, jm";
+	sql += "name, symbol, pkwiu, jm";
 	sql += ", usluga, dodany, notatki, vatid";
 	sql += ", netto, zakupu, marza, rabat, kurs, clo";
 	sql += ", magazyn, magzmiana";
@@ -256,7 +256,7 @@ fakturadat::fakturadat(sqlite *db) : dbdat(db) {
 void fakturadat::clear(void) {
 	int i;
 	id = -1;
-	nazwa = "";
+	name = "";
 	for (i=0;i<=9;i++)
 		ogol[i] = "";
 	for (i=0;i<=10;i++)
@@ -283,7 +283,7 @@ void fakturadat::commit(void) {
 	int ret;
 	if (id>=0) {	// UPDATE
 		sql = "UPDATE faktura SET ";
-		sql += "nazwa = %Q";
+		sql += "name = %Q";
 		sql += ", miejsce_wystawienia = %Q, wystawil = %Q, data_wystawienia = %Q, data_sprzedazy = %Q";
 		sql += ", srodek_transportu = %Q, sposob_zaplaty = %Q, termin_zaplaty = %Q",
 		sql += ", zapl_kwota = %Q, zapl_dnia = %Q, uwagi = %Q";
@@ -293,7 +293,7 @@ void fakturadat::commit(void) {
 	} else {		// INSERT
 		id = generate_id();
 		sql += "INSERT INTO faktura ( ";
-		sql += "nazwa";
+		sql += "name";
 		sql += ", miejsce_wystawienia, wystawil, data_wystawienia, data_sprzedazy";
 		sql += ", srodek_transportu, sposob_zaplaty, termin_zaplaty";
 		sql += ", zapl_kwota, zapl_dnia, uwagi";
@@ -310,7 +310,7 @@ void fakturadat::commit(void) {
 	}
 //printf("sql:[%s]\n",sql.String());
 	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
-		nazwa.String(), ogol[0].String(), ogol[1].String(), ogol[2].String(), ogol[3].String(),
+		name.String(), ogol[0].String(), ogol[1].String(), ogol[2].String(), ogol[3].String(),
 		ogol[4].String(), ogol[5].String(), ogol[6].String(),
 		ogol[8].String(), ogol[9].String(), uwagi.String(),
 		odata[0].String(), odata[2].String(), odata[3].String(), odata[4].String(), odata[5].String(), odata[6].String(),
@@ -326,7 +326,7 @@ void fakturadat::fetch(void) {
 	char **result;
 	BString sql;	
 	sql = "SELECT ";
-	sql += "nazwa";
+	sql += "name";
 	sql += ", miejsce_wystawienia, wystawil, data_wystawienia, data_sprzedazy";
 	sql += ", srodek_transportu, sposob_zaplaty, termin_zaplaty";
 	sql += ", zapl_kwota, zapl_dnia, uwagi";
@@ -339,7 +339,7 @@ void fakturadat::fetch(void) {
 //printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 	// readout data
 	i = nCols;
-	nazwa = result[i++];
+	name = result[i++];
 	for (j=0;j<=6;j++) {
 		ogol[j] = result[i++];
 	}
@@ -514,7 +514,7 @@ void pozfaklist::commititem(int fakturaid, pozfakitem *item) {
 	id = generate_id();
 	sql = "INSERT INTO pozycjafakt ( ";
 	sql += "id, lp, ilosc";
-	sql += ", nazwa, pkwiu, jm, vatid, netto, rabat";
+	sql += ", name, pkwiu, jm, vatid, netto, rabat";
 	sql += ", fakturaid ) VALUES ( ";
 	sql += "%i, %i, %Q";
 	sql += ", %Q, %Q, %Q, %i, %Q, %Q";
@@ -542,7 +542,7 @@ void pozfaklist::fetch(int fakturaid) {
 
 	sql = "SELECT ";
 	sql += "id, lp, ilosc";
-	sql += ", nazwa, pkwiu, jm, vatid, netto, rabat";
+	sql += ", name, pkwiu, jm, vatid, netto, rabat";
 	sql += " FROM pozycjafakt WHERE fakturaid = ";
 	sql << fakturaid;
 	sql += " ORDER BY lp";
@@ -559,7 +559,7 @@ void pozfaklist::fetch(int fakturaid) {
 		i++;							// id, unused
 		data->data[0] = result[i++];	// lp, unused
 		data->data[3] = result[i++];	// ilosc
-		data->data[1] = result[i++];	// nazwa
+		data->data[1] = result[i++];	// name
 		data->data[2] = result[i++];	// pkwiu
 		data->data[4] = result[i++];	// jm
 		data->vatid = toint(result[i++]); //vatid
@@ -579,7 +579,7 @@ void pozfaklist::fetch(int fakturaid) {
 		}
 		calcBruttoFin(result);
 		// vat = stawka
-		sql = "SELECT nazwa FROM stawka_vat WHERE id = "; sql << data->vatid;
+		sql = "SELECT name FROM stawka_vat WHERE id = "; sql << data->vatid;
 		data->data[8] = execSQL(sql.String());
 		j++;							// next row
 	}
@@ -653,7 +653,7 @@ const char *pozfaklist::calcSumPayment(void) {
 }
 
 void pozfaklist::updateStorage(int fakturaid = -1) {
-	BString sql, nazwa, magazyn, stare;
+	BString sql, name, magazyn, stare;
 	pozfakitem *cur = start;
 	int ret;
 	int nRows, nCols;
@@ -662,8 +662,8 @@ void pozfaklist::updateStorage(int fakturaid = -1) {
 
 	while (cur!=NULL) {
 		// get state
-		nazwa = cur->data->data[1]; nazwa.ReplaceAll("'","''"); nazwa.Prepend("'"); nazwa.Append("'");
-		sql = "SELECT usluga,magazyn FROM towar WHERE nazwa = "; sql += nazwa;
+		name = cur->data->data[1]; name.ReplaceAll("'","''"); name.Prepend("'"); name.Append("'");
+		sql = "SELECT usluga,magazyn FROM towar WHERE name = "; sql += name;
 		sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 		if (nRows<1) {
 			// nie ma takiego w bazie, nic nie robic
@@ -674,11 +674,11 @@ void pozfaklist::updateStorage(int fakturaid = -1) {
 			if (!usluga) {
 				// calc new magazyn state
 				magazyn = result[nCols+1];
-//				printf("[%s]:mag:%s, nowe:%s\n",nazwa.String(),magazyn.String(),cur->data->data[3].String());
+//				printf("[%s]:mag:%s, nowe:%s\n",name.String(),magazyn.String(),cur->data->data[3].String());
 				if (fakturaid > 0) {
 					// get old state
 					sql = "SELECT ilosc FROM pozycjafakt WHERE fakturaid = "; sql << fakturaid;
-					sql += " AND nazwa = "; sql += nazwa;
+					sql += " AND name = "; sql += name;
 					stare = execSQL(sql.String());
 				} else {
 					stare = "0";
@@ -686,11 +686,11 @@ void pozfaklist::updateStorage(int fakturaid = -1) {
 				sql = "SELECT 0"; sql += stare; sql += "+0"; sql += magazyn; sql += "-0"; sql += cur->data->data[3];
 //printf("sql=[%s],magazyn=[%s]\n",sql.String(),execSQL(sql.String()));
 				magazyn = execSQL(sql.String());
-//				printf("nowy mag[%s]: [%s]\n",nazwa.String(), magazyn.String());
-				// update magazyn state (note that nazwa() is already quoted)
+//				printf("nowy mag[%s]: [%s]\n",name.String(), magazyn.String());
+				// update magazyn state (note that name() is already quoted)
 				ret = sqlite_exec_printf(dbData,
-					"UPDATE towar SET magazyn = %Q, magzmiana = DATE('now') WHERE nazwa = %s",
-					0, 0, &dbErrMsg, magazyn.String(), nazwa.String());
+					"UPDATE towar SET magazyn = %Q, magzmiana = DATE('now') WHERE name = %s",
+					0, 0, &dbErrMsg, magazyn.String(), name.String());
 //				printf("got:%i,%s\n",ret,dbErrMsg);
 			}
 		}

@@ -82,7 +82,7 @@ void printHTML::Go(void) {
 		out.ReplaceAll("@SNIP@", "");
 	}
 	// faktura
-	out.ReplaceAll("@FNUMER@", fdata->nazwa.String());
+	out.ReplaceAll("@FNUMER@", fdata->name.String());
 	out.ReplaceAll("@FTYP@", typfaktury.String());
 	out.ReplaceAll("@FMIEJSCEW@", fdata->ogol[0].String());
 	out.ReplaceAll("@FWYSTAWIL@", fdata->ogol[1].String());

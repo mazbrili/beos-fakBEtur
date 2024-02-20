@@ -76,7 +76,7 @@ dialNalodb::dialNalodb(sqlite *db, const char *odb) : BWindow(
 	but_close->ResizeToPreferred();
 	but_close->MakeDefault(true);
 
-	BString tmp = "SELECT id FROM firma WHERE nazwa = '";
+	BString tmp = "SELECT id FROM firma WHERE name = '";
 	tmp += odb; tmp += "'";
 	id = toint(execSQL(tmp.String()));
 	if (id<=0)
@@ -92,8 +92,8 @@ dialNalodb::dialNalodb(sqlite *db, const char *odb) : BWindow(
 	// prepare temporary for stats
 	execSQL("CREATE TEMPORARY TABLE nalodbsuma ( kwota DECIMAL(12,2), typ INTEGER )");
 
-	sql = "SELECT f.id, f.nazwa, f.onazwa, f.termin_zaplaty, f.zapl_kwota";
-	sql += " FROM faktura AS f, firma AS k WHERE k.nazwa = f.onazwa ORDER BY f.data_sprzedazy";
+	sql = "SELECT f.id, f.name, f.onazwa, f.termin_zaplaty, f.zapl_kwota";
+	sql += " FROM faktura AS f, firma AS k WHERE k.name = f.onazwa ORDER BY f.data_sprzedazy";
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries

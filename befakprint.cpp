@@ -30,7 +30,7 @@ beFakPrint::beFakPrint(int id, sqlite *db, int numkopii) {
 	BString sql;
 	sql = "SELECT p_typ, p_writepath, p_textcols";
 	sql += ", p_texteol, p_htmltemplate";
-	sql += ", nazwa, adres, kod, miejscowosc, telefon, email";
+	sql += ", name, adres, kod, miejscowosc, telefon, email";
 	sql += ", nip, regon, bank, konto";
 	sql += " FROM konfiguracja WHERE zrobiona = 1";
 //printf("sql:%s\n",sql.String());
@@ -97,7 +97,7 @@ void beFakPrint::makeSummary(void) {
 	BString sql;
 
 	// suma z rozbiciem na stawki
-	sql = "SELECT DECROUND(SUM(s.wnetto)), v.nazwa, DECROUND(SUM(s.wvat)), DECROUND(SUM(s.wbrutto)) FROM sumawydruk AS s, stawka_vat AS v WHERE v.id = s.vatid GROUP BY s.vatid ORDER BY v.stawka";
+	sql = "SELECT DECROUND(SUM(s.wnetto)), v.name, DECROUND(SUM(s.wvat)), DECROUND(SUM(s.wbrutto)) FROM sumawydruk AS s, stawka_vat AS v WHERE v.id = s.vatid GROUP BY s.vatid ORDER BY v.stawka";
 //printf("sql:[%s]\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
@@ -230,7 +230,7 @@ const char *beFakPrint::slownie(const char *input) {
 
 const char *beFakPrint::makeName(void) {
 	static BString tmp;
-	tmp = fdata->nazwa;
+	tmp = fdata->name;
 	// prepare a safe filename
 	tmp.ReplaceAll("/","-");
 	tmp.ReplaceAll("\\","-");

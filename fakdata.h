@@ -62,7 +62,7 @@
 			void fetch(void);
 			void del(void);
 			// data itself
-			BString nazwa, uwagi;
+			BString name, uwagi;
 			BString ogol[10], odata[11];
 	};
 
@@ -73,7 +73,7 @@
 			~pozfakdata() { };
 	
 			BString data[12];
-			// lp, nazwa, pkwiu, ilosc, jm, rabat, cena jednostkowa, w.netto, vat,
+			// lp, name, pkwiu, ilosc, jm, rabat, cena jednostkowa, w.netto, vat,
 			// w.vat, w.brutto, c.netto
 			int vatid;	// odp. stawce vat, być może zamiast w/w
 	};

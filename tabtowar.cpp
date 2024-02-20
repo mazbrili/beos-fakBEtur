@@ -256,16 +256,16 @@ bool tabTowar::validateTab(void) {
 	BAlert *error;
 	BString sql, tmp;
 	int i;
-	// nazwa - niepusta
+	// name - niepusta
 	if (strlen(data[0]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wpisano nazwy towaru!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		data[0]->MakeFocus();
 		return false;
 	}
-	// nazwa - unikalna
+	// name - unikalna
 	tmp = data[0]->Text(); tmp.ReplaceAll("'","''");	// sql quote
-	sql = "SELECT id FROM towar WHERE nazwa = '"; sql += tmp; sql += "'";
+	sql = "SELECT id FROM towar WHERE name = '"; sql += tmp; sql += "'";
 	i = toint(execSQL(sql.String()));
 	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != 0) && (i != curdata->id))) {
 		error = new BAlert(APP_NAME, "Nazwa towaru nie jest unikalna!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
@@ -504,7 +504,7 @@ void tabTowar::RefreshIndexList(void) {
 	// select list from db
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT id, symbol, nazwa FROM towar ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT id, symbol, name FROM towar ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {
@@ -526,7 +526,7 @@ void tabTowar::RefreshVatSymbols(void) {
 	char **result;
 	BMessage *msg;
 
-	sqlite_get_table(dbData, "SELECT id, nazwa FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT id, name FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// XXX Panic! empty vat table
 	} else {

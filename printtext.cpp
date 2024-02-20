@@ -59,7 +59,7 @@ void printText::Go(void) {
 	//[7] [wolna]
 	out += ELINE;
 	//[8] ...Faktura VAT nr XXX....
-	line = "Faktura VAT nr "; line += fdata->nazwa.String();
+	line = "Faktura VAT nr "; line += fdata->name.String();
 	line = centerAlign(line); line += ELINE;
 	out += line;
 	//[9] ...[typ faktury]...
@@ -130,7 +130,7 @@ void printText::Go(void) {
 		if (wide) {
 			// lp
 			tmp = ""; tmp << cur->lp; line += fitAlignR(tmp,4,true); line += "|";
-			// nazwa
+			// name
 			line += fitAlignL(cur->data->data[1],41,true); line += "|";
 			// pkwiu
 			line += fitAlignR(cur->data->data[2],13,true); line += "|";
@@ -153,7 +153,7 @@ void printText::Go(void) {
 		} else {
 			// lp
 			tmp = ""; tmp << cur->lp; line += fitAlignR(tmp,2); line += "|";
-			// nazwa
+			// name
 			line += fitAlignL(cur->data->data[1],7); line += "|";
 			// pkwiu
 			line += fitAlignR(cur->data->data[2],8); line += "|";

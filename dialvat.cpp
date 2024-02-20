@@ -46,9 +46,9 @@ dialVat::dialVat(sqlite *db, BHandler *hr) : BWindow(
 	box1->SetLabel("Dane stawki podatku");
 	view->AddChild(box1);
 
-	nazwa  = new BTextControl(BRect(10,20,160,40), "dVNazwa", "Nazwa", NULL, new BMessage(DC));
+	name  = new BTextControl(BRect(10,20,160,40), "dVNazwa", "Nazwa", NULL, new BMessage(DC));
 	stawka = new BTextControl(BRect(10,50,160,70), "dvStawka", "Stawka (%)", NULL, new BMessage(DC));
-	box1->AddChild(nazwa);
+	box1->AddChild(name);
 	box1->AddChild(stawka);
 
 	but_new = new BButton(BRect(160,200,240,230), "dv_but_new", "Nowa", new BMessage(BUT_NEW), B_FOLLOW_BOTTOM);
@@ -62,8 +62,8 @@ dialVat::dialVat(sqlite *db, BHandler *hr) : BWindow(
 	but_save->ResizeToPreferred();
 
 	// fix widths
-	float d = max(be_plain_font->StringWidth(nazwa->Label())+5,be_plain_font->StringWidth(stawka->Label())+5);
-	nazwa->SetDivider(d); stawka->SetDivider(d);
+	float d = max(be_plain_font->StringWidth(name->Label())+5,be_plain_font->StringWidth(stawka->Label())+5);
+	name->SetDivider(d); stawka->SetDivider(d);
 
 	makeNewStawka();
 	RefreshIndexList();
@@ -86,7 +86,7 @@ void dialVat::makeNewStawka(void) {
 	id = -1;
 	this->dirty = false;
 	list->DeselectAll();
-	nazwa->SetText(""); stawka->SetText("");
+	name->SetText(""); stawka->SetText("");
 	updateTab();
 }
 
@@ -109,15 +109,15 @@ void dialVat::MessageReceived(BMessage *Message) {
 			break;
 		case BUT_SAVE:
 			if (id>=0) {
-				sql = "UPDATE stawka_vat SET nazwa = %Q WHERE aktywne = 1 AND id = "; sql << id;
-				ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg, nazwa->Text());
+				sql = "UPDATE stawka_vat SET name = %Q WHERE aktywne = 1 AND id = "; sql << id;
+				ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg, name->Text());
 			} else {
 				// dopisujemy nowy, ostrzec ze nieodwracalnie???
-				if (strlen(nazwa->Text())>0) {
+				if (strlen(name->Text())>0) {
 					stawka->SetText(validateDecimal(stawka->Text()));
 					ret = sqlite_exec_printf(dbData,
-					"INSERT INTO stawka_vat (nazwa,stawka,aktywne) VALUES ( %Q, %Q, 1 )",
-					0, 0, &dbErrMsg, nazwa->Text(), stawka->Text());
+					"INSERT INTO stawka_vat (name,stawka,aktywne) VALUES ( %Q, %Q, 1 )",
+					0, 0, &dbErrMsg, name->Text(), stawka->Text());
 				}
 			}
 			RefreshIndexList();
@@ -154,12 +154,12 @@ void dialVat::ChangedSelection(int newid) {
 	if (id >=0) {
 		int nRows, nCols;
 		char **result;
-		BString sql = "SELECT nazwa, stawka FROM stawka_vat WHERE id = "; sql << id;
+		BString sql = "SELECT name, stawka FROM stawka_vat WHERE id = "; sql << id;
 		sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 		if (nRows < 1) {
 			// no entries
 		} else {
-			nazwa->SetText(result[nCols]);
+			name->SetText(result[nCols]);
 			stawka->SetText(validateDecimal(result[nCols+1]));
 		}
 		sqlite_free_table(result);
@@ -180,7 +180,7 @@ void dialVat::RefreshIndexList(void) {
 	// select list from db
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT id, nazwa, stawka FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT id, name, stawka FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {

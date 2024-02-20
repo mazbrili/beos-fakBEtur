@@ -202,7 +202,7 @@ void BeFAKMainWindow::DoCheckConfig(void) {
 	char **result;
 	BString sql;
 	// select NAZWA and all config data
-	sql = "SELECT nazwa, wersja, p_mode, p_typ, p_textcols, p_texteol, f_numprosta FROM konfiguracja WHERE zrobiona = 1";
+	sql = "SELECT name, wersja, p_mode, p_typ, p_textcols, p_texteol, f_numprosta FROM konfiguracja WHERE zrobiona = 1";
 //printf("sql:%s\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i\n", nRows, nCols);
@@ -210,7 +210,7 @@ void BeFAKMainWindow::DoCheckConfig(void) {
 		DoConfigFirma(false);	// should never happen
 	} else {
 		int i = nCols;
-		sql = result[i++];	// test for 'nazwa' not ""
+		sql = result[i++];	// test for 'name' not ""
 		if (sql.Length() == 0)
 			DoConfigFirma(false);
 		// read other config data from result

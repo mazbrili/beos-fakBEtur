@@ -35,7 +35,7 @@ dialSymbol::dialSymbol(sqlite *db, bool towar, dbdat *data, BHandler *hr) : BWin
 	symbol->SetDivider(be_plain_font->StringWidth(symbol->Label())+5);
 	BRect r(0,20,240,35);
 	r.left = symbol->Divider()+40;
-	view->AddChild(nazwa = new BStringView(r, "symbolNazwa", NULL));
+	view->AddChild(name = new BStringView(r, "symbolNazwa", NULL));
 	view->AddChild(error = new BStringView(BRect(70,80,240,100), "symbolError", NULL));
 	view->AddChild(but_ok = new BButton(BRect(240,110,290,140), "symbolButok", "OK", new BMessage(BUT_OK)));
 	view->AddChild(but_cancel = new BButton(BRect(15,110,70,140), "symbolButCancel", "Anuluj", new BMessage(BUT_CANCEL)));
@@ -43,10 +43,10 @@ dialSymbol::dialSymbol(sqlite *db, bool towar, dbdat *data, BHandler *hr) : BWin
 	but_cancel->ResizeToPreferred();
 
 	if (istowar) {
-		nazwa->SetText(((towardat*)curdata)->data[0].String());
+		name->SetText(((towardat*)curdata)->data[0].String());
 		symbol->SetText(((towardat*)curdata)->data[0].String());
 	} else {
-		nazwa->SetText(((firmadat*)curdata)->data[0].String());
+		name->SetText(((firmadat*)curdata)->data[0].String());
 		symbol->SetText(((firmadat*)curdata)->data[0].String());
 	}
 	but_ok->MakeDefault(true);

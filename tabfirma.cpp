@@ -189,7 +189,7 @@ bool tabFirma::validateTab(void) {
 	}
 	// name - unique
 	tmp = data[0]->Text(); tmp.ReplaceAll("'","''");	// sql quote
-	sql = "SELECT id FROM firma WHERE nazwa = '"; sql += tmp; sql += "'";
+	sql = "SELECT id FROM firma WHERE name = '"; sql += tmp; sql += "'";
 	i = toint(execSQL(sql.String()));
 	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != 0) && (i != curdata->id))) {
 		error = new BAlert(APP_NAME, "The company name is not unique!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
@@ -359,7 +359,7 @@ void tabFirma::RefreshIndexList(void) {
 	// select list from db
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT id, symbol, nazwa FROM firma ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT id, symbol, name FROM firma ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {

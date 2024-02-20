@@ -74,7 +74,7 @@ void dialNaleznosci::DoFind(void) {
 			list->MakeEmpty();
 	}
 	// construct sql query
-	BString sql = "SELECT id, nazwa, onazwa, termin_zaplaty, zapl_kwota FROM faktura WHERE ";
+	BString sql = "SELECT id, name, onazwa, termin_zaplaty, zapl_kwota FROM faktura WHERE ";
 	sql += "termin_zaplaty <= '";
 	sql += daysagostring(toint(daysago->Text()));
 	sql += "' ORDER BY termin_zaplaty";

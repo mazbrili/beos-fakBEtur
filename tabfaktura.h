@@ -73,7 +73,7 @@ class tabFaktura : public beFakTab {
 		BButton *but_psave, *but_pnew, *but_pimport, *but_pdel;
 		ColumnListView *list;
 
-		BTextControl *nazwa;
+		BTextControl *name;
 		BTextControl *ogol[10], *data[11], *towar[6];
 		BStringView *suma[6];
 		BStringView *sumasuma, *magazyn;

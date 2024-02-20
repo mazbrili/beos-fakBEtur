@@ -32,7 +32,7 @@ class dialVat : public BWindow, public beFakTab {
 		ColumnListView *list;
 
 		int id;
-		BTextControl *nazwa, *stawka;
+		BTextControl *name, *stawka;
 };
 
 #endif
